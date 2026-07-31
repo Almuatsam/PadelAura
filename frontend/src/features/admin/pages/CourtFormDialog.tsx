@@ -135,7 +135,7 @@ export function CourtFormDialog({ open, onOpenChange, court, onSubmit, isSubmitt
             <Label className="mb-2">{t("admin.courts.schedule")}</Label>
             <div className="flex flex-col gap-2">
               {rows.map((row) => (
-                <div key={row.dayOfWeek} className="flex items-center gap-3">
+                <div key={row.dayOfWeek} className="flex flex-wrap items-center gap-3">
                   <Switch
                     checked={row.isOpen}
                     onCheckedChange={(checked) => updateRow(row.dayOfWeek, { isOpen: checked })}

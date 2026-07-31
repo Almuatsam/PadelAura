@@ -57,16 +57,38 @@ export function AdminLayout() {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-end gap-2 border-b border-border bg-card px-4 py-3 md:px-6">
-          <Button variant="ghost" size="sm" onClick={toggleLanguage}>
-            <Languages className="size-4" />
-            {t("admin.common.language")}
-          </Button>
-          <Button variant="ghost" size="sm" onClick={logout}>
-            <LogOut className="size-4" />
-            {t("admin.logout")}
-          </Button>
+        <header className="flex items-center justify-between gap-2 border-b border-border bg-card px-4 py-3 md:justify-end md:px-6">
+          <div className="text-lg font-semibold text-primary md:hidden">Padel Aura</div>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={toggleLanguage}>
+              <Languages className="size-4" />
+              {t("admin.common.language")}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={logout}>
+              <LogOut className="size-4" />
+              {t("admin.logout")}
+            </Button>
+          </div>
         </header>
+
+        <nav className="flex gap-1 overflow-x-auto border-b border-border bg-card px-4 py-2 md:hidden">
+          {navItems.map(({ to, key, icon: Icon, end }) => (
+            <NavLink
+              key={key}
+              to={to}
+              end={end}
+              className={({ isActive }) =>
+                cn(
+                  "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+                  isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted",
+                )
+              }
+            >
+              <Icon className="size-4" />
+              {t(`admin.nav.${key}`)}
+            </NavLink>
+          ))}
+        </nav>
 
         <main className="flex-1 p-4 md:p-6">
           <Outlet />

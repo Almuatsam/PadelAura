@@ -88,7 +88,7 @@ export function PromotionFormDialog({ open, onOpenChange, promotion, onSubmit, i
 
             <div className="flex flex-col gap-2">
               {rules.map((rule, index) => (
-                <div key={index} className="flex items-center gap-2 rounded-lg border border-border p-2.5">
+                <div key={index} className="flex flex-wrap items-center gap-2 rounded-lg border border-border p-2.5">
                   <div className="flex flex-col gap-1">
                     <Label className="text-xs text-muted-foreground">{t("admin.promotions.minimumHours")}</Label>
                     <Input

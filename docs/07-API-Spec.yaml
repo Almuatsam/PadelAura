@@ -1,0 +1,330 @@
+openapi: 3.0.3
+info:
+  title: Padel Booking Platform API
+  description: API لمنصة حجز ملاعب البادل — لوحة تحكم إدارية وواجهة عميل بدون تسجيل.
+  version: "1.0.0"
+servers:
+  - url: https://api.padel.example.com/api
+    description: Production (placeholder)
+  - url: http://localhost:5000/api
+    description: Local development
+
+tags:
+  - name: Auth
+  - name: Admin - Courts
+  - name: Admin - Closures
+  - name: Admin - Bookings
+  - name: Admin - Promotions
+  - name: Admin - Dashboard
+  - name: Customer
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: تسجيل دخول المدير
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, format: password }
+      responses:
+        "200":
+          description: نجاح تسجيل الدخول
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  expiresAt: { type: string, format: date-time }
+        "401":
+          description: بيانات دخول غير صحيحة
+
+  /admin/courts:
+    get:
+      tags: [Admin - Courts]
+      summary: قائمة الملاعب
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Court" }
+    post:
+      tags: [Admin - Courts]
+      summary: إضافة ملعب جديد
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CourtInput" }
+      responses:
+        "201": { description: تم الإنشاء }
+
+  /admin/courts/{id}:
+    put:
+      tags: [Admin - Courts]
+      summary: تعديل ملعب
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CourtInput" }
+      responses:
+        "200": { description: تم التعديل }
+    delete:
+      tags: [Admin - Courts]
+      summary: حذف ملعب
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204": { description: تم الحذف }
+
+  /admin/closures:
+    post:
+      tags: [Admin - Closures]
+      summary: إغلاق ملعب/عدة ملاعب/كل الملاعب لتاريخ أو فترة
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                courtIds:
+                  type: array
+                  items: { type: integer }
+                  description: فارغة = كل الملاعب
+                date: { type: string, format: date }
+                startTime: { type: string, nullable: true }
+                endTime: { type: string, nullable: true }
+                reason: { type: string }
+      responses:
+        "201": { description: تم الإغلاق }
+
+  /admin/bookings:
+    get:
+      tags: [Admin - Bookings]
+      summary: قائمة الحجوزات مع فلاتر
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: courtId
+          in: query
+          schema: { type: integer }
+        - name: date
+          in: query
+          schema: { type: string, format: date }
+        - name: status
+          in: query
+          schema: { type: string, enum: [Pending, Confirmed, Cancelled, Completed] }
+        - name: paymentMethod
+          in: query
+          schema: { type: string, enum: [PayOnArrival, Online] }
+        - name: phone
+          in: query
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Booking" }
+
+  /admin/promotions:
+    get:
+      tags: [Admin - Promotions]
+      summary: قائمة العروض
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Admin - Promotions]
+      summary: إنشاء عرض جديد (شرائح حسب عدد الساعات)
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PromotionInput" }
+      responses:
+        "201": { description: تم الإنشاء }
+
+  /admin/dashboard:
+    get:
+      tags: [Admin - Dashboard]
+      summary: إحصائيات ملخصة (حجوزات اليوم، إيرادات، نسبة إشغال)
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: OK }
+
+  /customer/availability:
+    get:
+      tags: [Customer]
+      summary: جلب الأوقات المتاحة لتاريخ معيّن (بدون كشف أسماء الملاعب)
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    startTime: { type: string, example: "18:00" }
+                    endTime: { type: string, example: "19:00" }
+                    isAvailable: { type: boolean }
+                    price: { type: number, format: double }
+
+  /customer/book:
+    post:
+      tags: [Customer]
+      summary: إنشاء حجز جديد (سلة تحتوي سلوت واحد أو أكثر)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone, paymentMethod, slots]
+              properties:
+                phone: { type: string, example: "+96891234567" }
+                fullName: { type: string, nullable: true }
+                email: { type: string, nullable: true }
+                paymentMethod: { type: string, enum: [PayOnArrival, Online] }
+                slots:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      date: { type: string, format: date }
+                      startTime: { type: string }
+                      endTime: { type: string }
+      responses:
+        "201":
+          description: تم إنشاء الحجز
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bookingReference: { type: string, example: "PDL-8X2K91" }
+                  total: { type: number }
+                  paymentUrl:
+                    type: string
+                    nullable: true
+                    description: يظهر فقط في حال الدفع الإلكتروني
+        "409":
+          description: أحد السلوتات المختارة لم يعد متاحًا
+
+  /customer/bookings/{reference}:
+    get:
+      tags: [Customer]
+      summary: استعلام عن حالة حجز برقمه المرجعي
+      parameters:
+        - name: reference
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: OK }
+        "404": { description: غير موجود }
+
+  /payment/webhook:
+    post:
+      tags: [Customer]
+      summary: استقبال إشعار حالة الدفع من Thawani
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200": { description: تم الاستلام }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Court:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        hourPrice: { type: number }
+        status: { type: string, enum: [Active, Inactive] }
+    CourtInput:
+      type: object
+      required: [name, hourPrice]
+      properties:
+        name: { type: string }
+        hourPrice: { type: number }
+        schedules:
+          type: array
+          items:
+            type: object
+            properties:
+              dayOfWeek: { type: integer, minimum: 0, maximum: 6 }
+              openTime: { type: string }
+              closeTime: { type: string }
+    PromotionInput:
+      type: object
+      properties:
+        name: { type: string }
+        rules:
+          type: array
+          items:
+            type: object
+            properties:
+              minimumHours: { type: integer }
+              ratePerHour: { type: number }
+    Booking:
+      type: object
+      properties:
+        id: { type: integer }
+        bookingReference: { type: string }
+        customerPhone: { type: string }
+        status: { type: string }
+        total: { type: number }
+        paymentMethod: { type: string }
+        paymentStatus: { type: string }
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              courtName: { type: string }
+              date: { type: string, format: date }
+              startTime: { type: string }
+              endTime: { type: string }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Padel.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using Padel.Infrastructure.Persistence;
 namespace Padel.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(PadelDbContext))]
-    partial class PadelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260731093737_InitialSchema")]
+    partial class InitialSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

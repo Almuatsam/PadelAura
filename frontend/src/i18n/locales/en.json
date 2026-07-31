@@ -94,5 +94,66 @@
     "common": {
       "language": "العربية"
     }
+  },
+  "customer": {
+    "back": "Back",
+    "landing": {
+      "title": "Book your padel court in minutes",
+      "subtitle": "Pick a time, no account needed. Pay online or at the club.",
+      "cta": "Book Now",
+      "features": {
+        "fast": { "title": "Fast booking", "body": "Reserve a court in under two minutes." },
+        "courts": { "title": "Multiple courts", "body": "We'll assign an available court for your slot." },
+        "secure": { "title": "Secure payment", "body": "Pay online or on arrival, your choice." }
+      }
+    },
+    "slots": {
+      "dateLabel": "Date",
+      "legend": "Tap an available time to add it to your booking.",
+      "loading": "Loading available times…",
+      "noneOpen": "No time slots are open on this date.",
+      "continue": "Continue"
+    },
+    "cart": {
+      "title": "Your selection",
+      "empty": "No time slots selected yet.",
+      "total": "Total"
+    },
+    "contact": {
+      "phone": "Phone number",
+      "phoneError": "Enter a valid phone number.",
+      "fullName": "Full name (optional)",
+      "email": "Email (optional)",
+      "emailError": "Enter a valid email address.",
+      "paymentMethod": "Payment method",
+      "payOnArrival": "Pay on arrival",
+      "payOnline": "Pay online",
+      "continue": "Continue"
+    },
+    "review": {
+      "slots": "Selected times",
+      "confirm": "Confirm booking",
+      "conflictError": "One of your selected times was just booked by someone else. Please pick another.",
+      "genericError": "Something went wrong creating your booking. Please try again."
+    },
+    "confirmation": {
+      "loading": "Loading your booking…",
+      "notFound": "We couldn't find that booking.",
+      "reference": "Booking reference",
+      "processing": "Waiting for payment confirmation…",
+      "paymentStatus": "Payment status",
+      "status": {
+        "Pending": "Pending",
+        "Confirmed": "Confirmed",
+        "Cancelled": "Cancelled",
+        "Completed": "Completed"
+      },
+      "paymentStatusValue": {
+        "Unpaid": "Unpaid",
+        "Paid": "Paid",
+        "Failed": "Failed",
+        "Refunded": "Refunded"
+      }
+    }
   }
 }

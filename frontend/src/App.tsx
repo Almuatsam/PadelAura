@@ -10,6 +10,10 @@ import { CourtsPage } from "@/features/admin/pages/CourtsPage"
 import { ClosuresPage } from "@/features/admin/pages/ClosuresPage"
 import { BookingsPage } from "@/features/admin/pages/BookingsPage"
 import { PromotionsPage } from "@/features/admin/pages/PromotionsPage"
+import { CustomerLayout } from "@/features/customer/CustomerLayout"
+import { LandingPage } from "@/features/customer/pages/LandingPage"
+import { BookingWizardPage } from "@/features/customer/pages/BookingWizardPage"
+import { BookingConfirmationPage } from "@/features/customer/pages/BookingConfirmationPage"
 
 const queryClient = new QueryClient()
 
@@ -20,7 +24,11 @@ function App() {
         <AuthProvider>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Navigate to="/admin" replace />} />
+              <Route element={<CustomerLayout />}>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/book" element={<BookingWizardPage />} />
+                <Route path="/booking/:reference" element={<BookingConfirmationPage />} />
+              </Route>
               <Route path="/admin/login" element={<LoginPage />} />
               <Route
                 path="/admin"
@@ -36,7 +44,7 @@ function App() {
                 <Route path="bookings" element={<BookingsPage />} />
                 <Route path="promotions" element={<PromotionsPage />} />
               </Route>
-              <Route path="*" element={<Navigate to="/admin" replace />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
         </AuthProvider>

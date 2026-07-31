@@ -1,6 +1,7 @@
 using System.Text.Json;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Padel.Application.Bookings.ProcessPaymentWebhook;
 
 namespace Padel.Api.Controllers.Customer;
@@ -14,6 +15,7 @@ public sealed class PaymentWebhookController(ISender sender) : ControllerBase
     // is never trusted for the actual payment status, only used to look up which booking to
     // re-verify.
     [HttpPost("webhook")]
+    [EnableRateLimiting("webhook")]
     public async Task<ActionResult> Webhook([FromBody] JsonElement body, CancellationToken cancellationToken)
     {
         await sender.Send(new ProcessPaymentWebhookCommand(ExtractSessionId(body)), cancellationToken);

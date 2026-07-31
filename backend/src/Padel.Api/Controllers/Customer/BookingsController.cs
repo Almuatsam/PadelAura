@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Padel.Application.Bookings.CreateBooking;
 using Padel.Application.Bookings.GetBookingByReference;
 
@@ -10,6 +11,7 @@ namespace Padel.Api.Controllers.Customer;
 public sealed class BookingsController(ISender sender) : ControllerBase
 {
     [HttpPost("book")]
+    [EnableRateLimiting("booking")]
     public async Task<ActionResult<CreateBookingResult>> Book(
         CreateBookingCommand command, CancellationToken cancellationToken)
     {
@@ -18,6 +20,7 @@ public sealed class BookingsController(ISender sender) : ControllerBase
     }
 
     [HttpGet("bookings/{reference}")]
+    [EnableRateLimiting("lookup")]
     public async Task<ActionResult<BookingStatusDto>> GetByReference(
         string reference, CancellationToken cancellationToken)
     {

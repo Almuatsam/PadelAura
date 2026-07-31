@@ -1,6 +1,10 @@
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Padel.Api.Middleware;
@@ -45,6 +49,52 @@ builder.Services
     });
 builder.Services.AddAuthorization();
 
+// Rate limiting on sensitive/public endpoints — required by docs/02-TDD.md's "Rate Limiting on
+// login and booking to prevent brute-force/spam booking" and extended here to the other
+// unauthenticated customer-facing endpoints for the same reason. Partitioned by remote IP so one
+// caller can't exhaust another's quota.
+builder.Services.AddRateLimiter(options =>
+{
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+        {
+            context.HttpContext.Response.Headers.RetryAfter = ((int)retryAfter.TotalSeconds).ToString();
+        }
+
+        var problemDetails = new ProblemDetails
+        {
+            Title = "Too many requests.",
+            Status = StatusCodes.Status429TooManyRequests,
+        };
+        await context.HttpContext.Response.WriteAsync(JsonSerializer.Serialize(problemDetails), cancellationToken);
+    };
+
+    static string PartitionKey(HttpContext httpContext) =>
+        httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+    options.AddPolicy("login", httpContext => RateLimitPartition.GetFixedWindowLimiter(
+        PartitionKey(httpContext),
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(5) }));
+
+    options.AddPolicy("booking", httpContext => RateLimitPartition.GetFixedWindowLimiter(
+        PartitionKey(httpContext),
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 8, Window = TimeSpan.FromMinutes(1) }));
+
+    options.AddPolicy("lookup", httpContext => RateLimitPartition.GetFixedWindowLimiter(
+        PartitionKey(httpContext),
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1) }));
+
+    options.AddPolicy("availability", httpContext => RateLimitPartition.GetFixedWindowLimiter(
+        PartitionKey(httpContext),
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 30, Window = TimeSpan.FromMinutes(1) }));
+
+    options.AddPolicy("webhook", httpContext => RateLimitPartition.GetFixedWindowLimiter(
+        PartitionKey(httpContext),
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 30, Window = TimeSpan.FromMinutes(1) }));
+});
+
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 builder.Services.AddCors(options =>
 {
@@ -80,6 +130,7 @@ app.UseCors("Default");
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapControllers();
 

@@ -50,6 +50,23 @@ public sealed class LoginCommandHandlerTests
     }
 
     [Fact]
+    public async Task Handle_StillCallsPasswordVerify_WhenEmailIsUnknown()
+    {
+        // Guards against reintroducing the short-circuit timing side-channel: an unknown email
+        // must pay the same password-hash-verification cost as a wrong password, not skip it.
+        await using var context = TestDbContextFactory.Create();
+        var passwordHasher = Substitute.For<IPasswordHasher>();
+        var jwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
+        var handler = new LoginCommandHandler(context, passwordHasher, jwtTokenGenerator);
+
+        var act = () => handler.Handle(
+            new LoginCommand("unknown@padel.local", "whatever"), CancellationToken.None);
+
+        await act.Should().ThrowAsync<AuthenticationFailedException>();
+        passwordHasher.Received(1).Verify("whatever", Arg.Any<string>());
+    }
+
+    [Fact]
     public async Task Handle_ThrowsAuthenticationFailedException_WhenPasswordIsWrong()
     {
         await using var context = TestDbContextFactory.Create();

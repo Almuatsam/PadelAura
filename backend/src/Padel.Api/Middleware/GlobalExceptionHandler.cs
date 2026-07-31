@@ -40,6 +40,15 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
                     Status = StatusCodes.Status401Unauthorized,
                 }),
 
+            SlotUnavailableException slotException => (
+                StatusCodes.Status409Conflict,
+                new ProblemDetails
+                {
+                    Title = "One or more selected slots are no longer available.",
+                    Detail = slotException.Message,
+                    Status = StatusCodes.Status409Conflict,
+                }),
+
             DbUpdateException => (
                 StatusCodes.Status409Conflict,
                 new ProblemDetails

@@ -1,6 +1,8 @@
 using FluentAssertions;
+using NSubstitute;
 using Padel.Application.Bookings.CreateBooking;
 using Padel.Application.Common.Exceptions;
+using Padel.Application.Common.Interfaces;
 using Padel.Application.Tests.Common;
 using Padel.Domain.Entities;
 using Padel.Domain.Enums;
@@ -23,13 +25,17 @@ public sealed class CreateBookingCommandHandlerTests
         return court;
     }
 
+    private static CreateBookingCommandHandler CreateHandler(
+        Padel.Infrastructure.Persistence.PadelDbContext context, IThawaniClient? thawaniClient = null) =>
+        new(new TestApplicationDbContext(context), thawaniClient ?? Substitute.For<IThawaniClient>());
+
     [Fact]
     public async Task Handle_CreatesConfirmedBooking_ForPayOnArrival()
     {
         await using var context = TestDbContextFactory.Create();
         await SeedCourtAsync(context);
 
-        var handler = new CreateBookingCommandHandler(new TestApplicationDbContext(context));
+        var handler = CreateHandler(context);
         var command = new CreateBookingCommand(
             "+96891234567", "Ali", null, PaymentMethod.PayOnArrival,
             [new BookingSlotInput(FutureDate, new TimeOnly(9, 0), new TimeOnly(10, 0))]);
@@ -54,7 +60,7 @@ public sealed class CreateBookingCommandHandlerTests
         context.Customers.Add(existingCustomer);
         await context.SaveChangesAsync(CancellationToken.None);
 
-        var handler = new CreateBookingCommandHandler(new TestApplicationDbContext(context));
+        var handler = CreateHandler(context);
         var command = new CreateBookingCommand(
             "+96891234567", null, null, PaymentMethod.PayOnArrival,
             [new BookingSlotInput(FutureDate, new TimeOnly(9, 0), new TimeOnly(10, 0))]);
@@ -70,7 +76,7 @@ public sealed class CreateBookingCommandHandlerTests
         await using var context = TestDbContextFactory.Create();
         await SeedCourtAsync(context);
 
-        var handler = new CreateBookingCommandHandler(new TestApplicationDbContext(context));
+        var handler = CreateHandler(context);
         var command = new CreateBookingCommand(
             "+96891234567", null, null, PaymentMethod.PayOnArrival,
             [new BookingSlotInput(FutureDate, new TimeOnly(6, 0), new TimeOnly(7, 0))]);
@@ -96,7 +102,7 @@ public sealed class CreateBookingCommandHandlerTests
         existingBooking.AddItem(court.Id, FutureDate, new TimeOnly(11, 0), new TimeOnly(12, 0), 15m);
         await context.SaveChangesAsync(CancellationToken.None);
 
-        var handler = new CreateBookingCommandHandler(new TestApplicationDbContext(context));
+        var handler = CreateHandler(context);
         var command = new CreateBookingCommand(
             "+96891234567", null, null, PaymentMethod.PayOnArrival,
             [
@@ -109,5 +115,59 @@ public sealed class CreateBookingCommandHandlerTests
         await act.Should().ThrowAsync<SlotUnavailableException>();
         context.Bookings.Should().ContainSingle(b => b.BookingReference == "PDL-EXIST1");
         context.Customers.Should().NotContain(c => c.Phone == "+96891234567");
+    }
+
+    [Fact]
+    public async Task Handle_CreatesCheckoutSession_ForOnlinePayment()
+    {
+        await using var context = TestDbContextFactory.Create();
+        await SeedCourtAsync(context);
+
+        var thawaniClient = Substitute.For<IThawaniClient>();
+        thawaniClient.CreateCheckoutSessionAsync(Arg.Any<CreateCheckoutSessionRequest>(), Arg.Any<CancellationToken>())
+            .Returns("checkout_abc123");
+        thawaniClient.BuildCheckoutUrl("checkout_abc123").Returns("https://uatcheckout.thawani.om/pay/checkout_abc123?key=pub");
+
+        var handler = CreateHandler(context, thawaniClient);
+        var command = new CreateBookingCommand(
+            "+96891234567", "Ali", null, PaymentMethod.Online,
+            [new BookingSlotInput(FutureDate, new TimeOnly(9, 0), new TimeOnly(10, 0))]);
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        result.PaymentUrl.Should().Be("https://uatcheckout.thawani.om/pay/checkout_abc123?key=pub");
+
+        var booking = context.Bookings.Single();
+        booking.Status.Should().Be(BookingStatus.Pending);
+
+        var payment = context.Payments.Single();
+        payment.SessionId.Should().Be("checkout_abc123");
+    }
+
+    [Fact]
+    public async Task Handle_KeepsBookingPendingWithNoPaymentUrl_WhenThawaniCallFails()
+    {
+        await using var context = TestDbContextFactory.Create();
+        await SeedCourtAsync(context);
+
+        var thawaniClient = Substitute.For<IThawaniClient>();
+        thawaniClient.CreateCheckoutSessionAsync(Arg.Any<CreateCheckoutSessionRequest>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<string>(new HttpRequestException("boom")));
+
+        var handler = CreateHandler(context, thawaniClient);
+        var command = new CreateBookingCommand(
+            "+96891234567", null, null, PaymentMethod.Online,
+            [new BookingSlotInput(FutureDate, new TimeOnly(9, 0), new TimeOnly(10, 0))]);
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        result.PaymentUrl.Should().BeNull();
+
+        var booking = context.Bookings.Single();
+        booking.Status.Should().Be(BookingStatus.Pending);
+
+        var payment = context.Payments.Single();
+        payment.SessionId.Should().BeNull();
+        payment.Status.Should().Be(PaymentTransactionStatus.Failed);
     }
 }

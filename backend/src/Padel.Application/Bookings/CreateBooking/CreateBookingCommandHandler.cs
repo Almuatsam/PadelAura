@@ -9,7 +9,7 @@ using Padel.Domain.Enums;
 
 namespace Padel.Application.Bookings.CreateBooking;
 
-public sealed class CreateBookingCommandHandler(IApplicationDbContext context)
+public sealed class CreateBookingCommandHandler(IApplicationDbContext context, IThawaniClient thawaniClient)
     : IRequestHandler<CreateBookingCommand, CreateBookingResult>
 {
     private const string ReferenceAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -110,12 +110,52 @@ public sealed class CreateBookingCommandHandler(IApplicationDbContext context)
             booking.Confirm();
         }
 
-        // Online payments stay Pending until the Thawani checkout session is created and its
-        // webhook confirms payment — that wiring is explicitly Phase 4 scope.
+        // Online payments stay Pending until Thawani confirms payment (lazily re-verified on read,
+        // or via the webhook — see PaymentStatusSynchronizer). The Thawani call itself happens
+        // after the transaction below commits: it's a network call, and must never happen while
+        // still holding the FOR UPDATE row/gap lock from the slot-resolution loop above.
         await context.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
 
-        return new CreateBookingResult(booking.BookingReference, booking.Total, PaymentUrl: null);
+        string? paymentUrl = null;
+        if (request.PaymentMethod == PaymentMethod.Online)
+        {
+            paymentUrl = await CreateThawaniSessionAsync(booking, request, totalHours, cancellationToken);
+        }
+
+        return new CreateBookingResult(booking.BookingReference, booking.Total, paymentUrl);
+    }
+
+    private async Task<string?> CreateThawaniSessionAsync(
+        Booking booking, CreateBookingCommand request, int totalHours, CancellationToken cancellationToken)
+    {
+        var checkoutRequest = new CreateCheckoutSessionRequest(
+            booking.BookingReference,
+            $"Padel court booking - {totalHours} hour(s)",
+            (int)Math.Round(booking.Total * 1000),
+            request.FullName,
+            request.Phone);
+
+        try
+        {
+            var sessionId = await thawaniClient.CreateCheckoutSessionAsync(checkoutRequest, cancellationToken);
+
+            context.Payments.Add(new Payment(booking.Id, "Thawani", booking.Total, sessionId));
+            await context.SaveChangesAsync(cancellationToken);
+
+            return thawaniClient.BuildCheckoutUrl(sessionId);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
+        {
+            // The booking/slot is already reserved regardless — record the failed attempt rather
+            // than losing the reservation because the payment gateway hiccuped.
+            var payment = new Payment(booking.Id, "Thawani", booking.Total);
+            payment.MarkFailed();
+            context.Payments.Add(payment);
+            await context.SaveChangesAsync(cancellationToken);
+
+            return null;
+        }
     }
 
     private async Task<string> GenerateUniqueReferenceAsync(CancellationToken cancellationToken)

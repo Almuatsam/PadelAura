@@ -1,6 +1,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Padel.Application.Bookings.Services;
 using Padel.Application.Common.Behaviors;
 
 namespace Padel.Application;
@@ -14,6 +15,8 @@ public static class DependencyInjection
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
         services.AddValidatorsFromAssembly(assembly);
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+        services.AddScoped<IPaymentStatusSynchronizer, PaymentStatusSynchronizer>();
 
         return services;
     }

@@ -21,8 +21,16 @@ public sealed class GetAvailabilityQueryHandler(IApplicationDbContext context)
             .Where(c => c.ClosureDate == request.Date)
             .ToListAsync(cancellationToken);
 
+        // A Pending booking (Online, awaiting Thawani payment) only counts as occupying its slot
+        // for a grace window — otherwise an abandoned checkout would block the slot forever, since
+        // nothing else ever moves a Pending booking off it. Compared in UTC since Booking.CreatedAt
+        // is stored as DateTime.UtcNow (unlike the Oman-local wall-clock checks below).
+        var graceThreshold = DateTime.UtcNow.AddMinutes(-BookingPolicy.PendingPaymentGraceMinutes);
+
         var occupiedSlots = await context.BookingItems
-            .Where(i => i.BookingDate == request.Date && i.CancelledAt == null)
+            .Where(i => i.BookingDate == request.Date && i.CancelledAt == null
+                && (i.Booking!.Status == BookingStatus.Confirmed
+                    || (i.Booking.Status == BookingStatus.Pending && i.Booking.CreatedAt > graceThreshold)))
             .Select(i => new { i.CourtId, i.StartTime })
             .ToListAsync(cancellationToken);
 

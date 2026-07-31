@@ -8,9 +8,16 @@ public static class DbSeeder
     public const string DefaultAdminEmail = "admin@padel.local";
     public const string DefaultAdminPassword = "Padel@12345";
 
-    public static async Task SeedAsync(PadelDbContext db, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// <paramref name="createDefaultAdmin"/> gates only the seeded admin account — courts and
+    /// promotions always seed regardless, since they're sample data, not a credential. Defaults to
+    /// `true` in Development (see appsettings.Development.json) and is absent (so effectively
+    /// `false`) in production config, so a real deployment doesn't silently get a well-known
+    /// admin@padel.local / Padel@12345 login unless a deployer explicitly opts in.
+    /// </summary>
+    public static async Task SeedAsync(PadelDbContext db, bool createDefaultAdmin = true, CancellationToken cancellationToken = default)
     {
-        if (!db.Admins.Any())
+        if (createDefaultAdmin && !db.Admins.Any())
         {
             var admin = new Admin(
                 fullName: "Padel Admin",

@@ -112,7 +112,12 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<PadelDbContext>();
     await db.Database.MigrateAsync();
-    await DbSeeder.SeedAsync(db);
+
+    // Only creates the well-known admin@padel.local seed login when explicitly enabled — see
+    // DbSeeder.SeedAsync's doc comment. Set in appsettings.Development.json; absent (false) in
+    // appsettings.json so production doesn't get it without an explicit opt-in.
+    var createDefaultAdmin = builder.Configuration.GetValue("Seed:CreateDefaultAdmin", false);
+    await DbSeeder.SeedAsync(db, createDefaultAdmin);
 }
 
 // Configure the HTTP request pipeline.

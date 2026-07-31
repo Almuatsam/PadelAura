@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Padel.Domain", "src\Padel.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Padel.Infrastructure", "src\Padel.Infrastructure\Padel.Infrastructure.csproj", "{5616C604-68FA-4B48-80D4-B85536A358D1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Padel.Application.Tests", "tests\Padel.Application.Tests\Padel.Application.Tests.csproj", "{47F9E6A9-C9A4-45E5-9663-D47560DD68BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +75,18 @@ Global
 		{5616C604-68FA-4B48-80D4-B85536A358D1}.Release|x64.Build.0 = Release|Any CPU
 		{5616C604-68FA-4B48-80D4-B85536A358D1}.Release|x86.ActiveCfg = Release|Any CPU
 		{5616C604-68FA-4B48-80D4-B85536A358D1}.Release|x86.Build.0 = Release|Any CPU
+		{47F9E6A9-C9A4-45E5-9663-D47560DD68BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47F9E6A9-C9A4-45E5-9663-D47560DD68BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47F9E6A9-C9A4-45E5-9663-D47560DD68BE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{47F9E6A9-C9A4-45E5-9663-D47560DD68BE}.Debug|x64.Build.0 = Debug|Any CPU
+		{47F9E6A9-C9A4-45E5-9663-D47560DD68BE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{47F9E6A9-C9A4-45E5-9663-D47560DD68BE}.Debug|x86.Build.0 = Debug|Any CPU
+		{47F9E6A9-C9A4-45E5-9663-D47560DD68BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47F9E6A9-C9A4-45E5-9663-D47560DD68BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47F9E6A9-C9A4-45E5-9663-D47560DD68BE}.Release|x64.ActiveCfg = Release|Any CPU
+		{47F9E6A9-C9A4-45E5-9663-D47560DD68BE}.Release|x64.Build.0 = Release|Any CPU
+		{47F9E6A9-C9A4-45E5-9663-D47560DD68BE}.Release|x86.ActiveCfg = Release|Any CPU
+		{47F9E6A9-C9A4-45E5-9663-D47560DD68BE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,5 +96,6 @@ Global
 		{9CD6D6DA-D69C-4579-BCA3-30C33FD4003E} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{3B319ADF-73A3-4B19-B87D-2270ED1441F1} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{5616C604-68FA-4B48-80D4-B85536A358D1} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{47F9E6A9-C9A4-45E5-9663-D47560DD68BE} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal

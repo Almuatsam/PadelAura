@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Padel.Application.Common.Interfaces;
 using Padel.Domain.Entities;
 
 namespace Padel.Infrastructure.Persistence;
 
-public class PadelDbContext(DbContextOptions<PadelDbContext> options) : DbContext(options)
+public class PadelDbContext(DbContextOptions<PadelDbContext> options) : DbContext(options), IApplicationDbContext
 {
     public DbSet<Admin> Admins => Set<Admin>();
     public DbSet<Court> Courts => Set<Court>();

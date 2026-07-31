@@ -10,6 +10,13 @@ namespace Padel.Api.Controllers.Admin;
 [Route("api/admin/closures")]
 public sealed class ClosuresController(ISender sender) : ControllerBase
 {
+    [HttpGet]
+    public async Task<ActionResult<List<ClosureDto>>> GetAll(CancellationToken cancellationToken)
+    {
+        var closures = await sender.Send(new GetClosuresQuery(), cancellationToken);
+        return Ok(closures);
+    }
+
     [HttpPost]
     public async Task<ActionResult> Create(CreateClosureCommand command, CancellationToken cancellationToken)
     {

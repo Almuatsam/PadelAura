@@ -22,6 +22,13 @@ public class Promotion : Entity
         EndDate = endDate;
     }
 
+    public void Update(string name, DateOnly? startDate, DateOnly? endDate)
+    {
+        Name = name;
+        StartDate = startDate;
+        EndDate = endDate;
+    }
+
     public void ReplaceRules(IEnumerable<PricingRule> rules)
     {
         _rules.Clear();

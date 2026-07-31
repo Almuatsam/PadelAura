@@ -9,4 +9,7 @@ public static class BookingPolicy
     /// else ever flips a Pending booking away from occupying its slot.
     /// </summary>
     public const int PendingPaymentGraceMinutes = 15;
+
+    /// <summary>How many bookings the admin bookings list returns per page.</summary>
+    public const int AdminBookingsPageSize = 20;
 }

@@ -1,0 +1,98 @@
+{
+  "admin": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "courts": "Courts",
+      "closures": "Closures",
+      "bookings": "Bookings",
+      "promotions": "Promotions"
+    },
+    "logout": "Log out",
+    "login": {
+      "title": "Admin Login",
+      "subtitle": "Sign in to manage courts, bookings and pricing.",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "error": "Invalid email or password."
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "todayBookings": "Today's Bookings",
+      "todayRevenue": "Today's Revenue",
+      "occupancy": "Occupancy Rate"
+    },
+    "courts": {
+      "title": "Courts",
+      "add": "Add Court",
+      "edit": "Edit Court",
+      "name": "Name",
+      "hourPrice": "Hour Price (OMR)",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "schedule": "Weekly Schedule",
+      "openTime": "Open",
+      "closeTime": "Close",
+      "closed": "Closed",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "confirmDelete": "Delete this court? This cannot be undone.",
+      "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    },
+    "closures": {
+      "title": "Closures",
+      "upcoming": "Upcoming Closures",
+      "add": "Add Closure",
+      "allCourts": "All courts",
+      "date": "Date",
+      "startTime": "Start Time (optional)",
+      "endTime": "End Time (optional)",
+      "reason": "Reason",
+      "save": "Save",
+      "court": "Court",
+      "wholeDay": "Whole day"
+    },
+    "bookings": {
+      "title": "Bookings",
+      "filters": {
+        "court": "Court",
+        "date": "Date",
+        "status": "Status",
+        "paymentMethod": "Payment Method",
+        "phone": "Phone",
+        "allCourts": "All courts",
+        "allStatuses": "All statuses",
+        "allMethods": "All methods"
+      },
+      "reference": "Reference",
+      "customer": "Customer",
+      "total": "Total",
+      "created": "Created",
+      "noResults": "No bookings match these filters.",
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {{page}}"
+    },
+    "promotions": {
+      "title": "Promotions",
+      "add": "Add Promotion",
+      "edit": "Edit Promotion",
+      "name": "Name",
+      "active": "Active",
+      "rules": "Pricing Rules",
+      "minimumHours": "Min. hours",
+      "discountType": "Discount type",
+      "discountValue": "Value",
+      "fixedRate": "Fixed rate / hour",
+      "percentage": "Percentage off",
+      "addRule": "Add rule",
+      "save": "Save",
+      "noRules": "No pricing rules yet."
+    },
+    "common": {
+      "language": "العربية"
+    }
+  }
+}

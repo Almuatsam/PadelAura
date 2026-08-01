@@ -9,7 +9,9 @@ services:
       MYSQL_USER: ${MYSQL_USER:-padel_user}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-change_me}
     ports:
-      - "${MYSQL_PORT:-3306}:3306"
+      # Bound to localhost only — this is a local dev database with a well-known default password
+      # (see .env.example); it should never be reachable from outside the host.
+      - "127.0.0.1:${MYSQL_PORT:-3306}:3306"
     volumes:
       - ./database/mysql-data:/var/lib/mysql
     healthcheck:

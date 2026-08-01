@@ -43,7 +43,16 @@ public class PadelDbContext(DbContextOptions<PadelDbContext> options) : DbContex
 
         // The id list is inlined as literal text (safe: these are `long`s we already fetched from
         // our own DB, never raw user input); sorted so concurrent calls always request row locks
-        // in the same order. `date`/`startTime` go through parameter placeholders.
+        // in the same order. `date`/`startTime` go through parameter placeholders. This guard turns
+        // that "never raw user input" assumption into an enforced invariant — a valid database
+        // primary key is always positive, so this fails loudly (in Release too, unlike
+        // Debug.Assert) rather than silently interpolating something unexpected into the SQL text
+        // if a future change ever threads unvalidated input through this path.
+        if (courtIds.Any(id => id <= 0))
+        {
+            throw new ArgumentOutOfRangeException(nameof(courtIds), "Court ids must be positive primary keys.");
+        }
+
         var idList = string.Join(",", courtIds.OrderBy(id => id));
         var graceThreshold = DateTime.UtcNow.AddMinutes(-BookingPolicy.PendingPaymentGraceMinutes);
 

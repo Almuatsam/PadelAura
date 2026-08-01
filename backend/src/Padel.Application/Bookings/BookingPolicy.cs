@@ -12,4 +12,11 @@ public static class BookingPolicy
 
     /// <summary>How many bookings the admin bookings list returns per page.</summary>
     public const int AdminBookingsPageSize = 20;
+
+    /// <summary>
+    /// Upper bound on slots per booking request. Without this, a single request could submit an
+    /// unbounded number of slots, each taking a FOR UPDATE row/gap lock inside one transaction —
+    /// a resource-exhaustion vector, not a realistic customer cart size.
+    /// </summary>
+    public const int MaxSlotsPerBooking = 20;
 }

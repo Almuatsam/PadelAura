@@ -13,7 +13,10 @@ public sealed class CreateBookingCommandValidator : AbstractValidator<CreateBook
 
         RuleFor(x => x.PaymentMethod).IsInEnum();
 
-        RuleFor(x => x.Slots).NotEmpty();
+        RuleFor(x => x.Slots)
+            .NotEmpty()
+            .Must(slots => slots.Count <= BookingPolicy.MaxSlotsPerBooking)
+            .WithMessage($"A booking cannot contain more than {BookingPolicy.MaxSlotsPerBooking} slots.");
 
         RuleForEach(x => x.Slots).SetValidator(new BookingSlotInputValidator());
 

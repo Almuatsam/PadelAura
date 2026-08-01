@@ -51,7 +51,13 @@ export function BookingConfirmationPage() {
       {isStillProcessing && (
         <div className="flex items-center justify-between rounded-lg border border-warning/20 bg-warning/10 p-3 text-sm text-warning">
           <span>{t("customer.confirmation.processing")}</span>
-          <Button variant="ghost" size="icon-sm" onClick={() => void refetch()} disabled={isFetching}>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={t("customer.confirmation.refresh")}
+            onClick={() => void refetch()}
+            disabled={isFetching}
+          >
             <RefreshCw className={isFetching ? "size-4 animate-spin" : "size-4"} />
           </Button>
         </div>

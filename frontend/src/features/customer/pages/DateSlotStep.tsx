@@ -73,7 +73,7 @@ export function DateSlotStep({ cart, onAddSlot, onRemoveSlot, onContinue }: Prop
                 disabled={!slot.isAvailable}
                 onClick={() => toggleSlot(slot)}
                 className={cn(
-                  "rounded-lg border px-2 py-2 text-sm font-medium transition-colors",
+                  "flex min-h-11 items-center justify-center rounded-lg border px-2 py-2 text-sm font-medium transition-colors",
                   !slot.isAvailable && "cursor-not-allowed border-border bg-muted text-muted-foreground line-through",
                   slot.isAvailable && !isSelected && "border-border bg-card hover:border-primary hover:text-primary",
                   isSelected && "border-primary bg-primary text-primary-foreground",

@@ -16,6 +16,7 @@ public interface IApplicationDbContext
     DbSet<Promotion> Promotions { get; }
     DbSet<PricingRule> PricingRules { get; }
     DbSet<Payment> Payments { get; }
+    DbSet<AuditLog> AuditLogs { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 

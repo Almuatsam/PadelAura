@@ -18,7 +18,7 @@ public sealed class UpdateCourtCommandHandlerTests
         context.Courts.Add(court);
         await context.SaveChangesAsync(CancellationToken.None);
 
-        var handler = new UpdateCourtCommandHandler(context);
+        var handler = new UpdateCourtCommandHandler(context, new FakeCurrentAdminService());
         var command = new UpdateCourtCommand(
             court.Id,
             "Court A Renamed",
@@ -32,13 +32,15 @@ public sealed class UpdateCourtCommandHandlerTests
         result.HourPrice.Should().Be(20m);
         result.Status.Should().Be(nameof(CourtStatus.Inactive));
         result.Schedules.Should().ContainSingle(s => s.DayOfWeek == 1);
+
+        context.AuditLogs.Should().ContainSingle(a => a.Action == "Update" && a.EntityType == "Court" && a.EntityId == court.Id);
     }
 
     [Fact]
     public async Task Handle_ThrowsNotFoundException_WhenCourtDoesNotExist()
     {
         await using var context = TestDbContextFactory.Create();
-        var handler = new UpdateCourtCommandHandler(context);
+        var handler = new UpdateCourtCommandHandler(context, new FakeCurrentAdminService());
         var command = new UpdateCourtCommand(999, "Court X", 15m, CourtStatus.Active, []);
 
         var act = () => handler.Handle(command, CancellationToken.None);

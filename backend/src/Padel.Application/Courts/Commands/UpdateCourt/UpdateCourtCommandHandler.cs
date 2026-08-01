@@ -1,3 +1,4 @@
+using System.Text.Json;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Padel.Application.Common.Exceptions;
@@ -6,7 +7,7 @@ using Padel.Domain.Entities;
 
 namespace Padel.Application.Courts.Commands.UpdateCourt;
 
-public sealed class UpdateCourtCommandHandler(IApplicationDbContext context)
+public sealed class UpdateCourtCommandHandler(IApplicationDbContext context, ICurrentAdminService currentAdmin)
     : IRequestHandler<UpdateCourtCommand, CourtDto>
 {
     public async Task<CourtDto> Handle(UpdateCourtCommand request, CancellationToken cancellationToken)
@@ -20,6 +21,10 @@ public sealed class UpdateCourtCommandHandler(IApplicationDbContext context)
 
         court.ReplaceSchedules(request.Schedules.Select(s =>
             new CourtSchedule(court.Id, s.DayOfWeek, s.OpenTime, s.CloseTime)));
+
+        context.AuditLogs.Add(new AuditLog(
+            currentAdmin.AdminId, "Update", nameof(Court), court.Id,
+            JsonSerializer.Serialize(new { court.Name, court.HourPrice, Status = court.Status.ToString() })));
 
         await context.SaveChangesAsync(cancellationToken);
 

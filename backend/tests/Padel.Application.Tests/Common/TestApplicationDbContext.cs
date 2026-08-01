@@ -26,6 +26,7 @@ public sealed class TestApplicationDbContext(PadelDbContext inner) : IApplicatio
     public DbSet<Promotion> Promotions => inner.Promotions;
     public DbSet<PricingRule> PricingRules => inner.PricingRules;
     public DbSet<Payment> Payments => inner.Payments;
+    public DbSet<AuditLog> AuditLogs => inner.AuditLogs;
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken) =>
         inner.SaveChangesAsync(cancellationToken);

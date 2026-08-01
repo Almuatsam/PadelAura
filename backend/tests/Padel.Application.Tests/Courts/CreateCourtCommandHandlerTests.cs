@@ -12,7 +12,7 @@ public sealed class CreateCourtCommandHandlerTests
     public async Task Handle_PersistsCourtWithSchedules()
     {
         await using var context = TestDbContextFactory.Create();
-        var handler = new CreateCourtCommandHandler(context);
+        var handler = new CreateCourtCommandHandler(context, new FakeCurrentAdminService());
 
         var command = new CreateCourtCommand(
             "Court D",
@@ -29,5 +29,7 @@ public sealed class CreateCourtCommandHandlerTests
         court.HourPrice.Should().Be(15.5m);
         court.Schedules.Should().ContainSingle(s =>
             s.DayOfWeek == 0 && s.OpenTime == new TimeOnly(8, 0) && s.CloseTime == new TimeOnly(23, 0));
+
+        context.AuditLogs.Should().ContainSingle(a => a.Action == "Create" && a.EntityType == "Court" && a.EntityId == id);
     }
 }

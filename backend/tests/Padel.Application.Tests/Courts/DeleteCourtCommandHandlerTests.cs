@@ -16,18 +16,19 @@ public sealed class DeleteCourtCommandHandlerTests
         context.Courts.Add(court);
         await context.SaveChangesAsync(CancellationToken.None);
 
-        var handler = new DeleteCourtCommandHandler(context);
+        var handler = new DeleteCourtCommandHandler(context, new FakeCurrentAdminService());
 
         await handler.Handle(new DeleteCourtCommand(court.Id), CancellationToken.None);
 
         context.Courts.Should().BeEmpty();
+        context.AuditLogs.Should().ContainSingle(a => a.Action == "Delete" && a.EntityType == "Court" && a.EntityId == court.Id);
     }
 
     [Fact]
     public async Task Handle_ThrowsNotFoundException_WhenCourtDoesNotExist()
     {
         await using var context = TestDbContextFactory.Create();
-        var handler = new DeleteCourtCommandHandler(context);
+        var handler = new DeleteCourtCommandHandler(context, new FakeCurrentAdminService());
 
         var act = () => handler.Handle(new DeleteCourtCommand(999), CancellationToken.None);
 

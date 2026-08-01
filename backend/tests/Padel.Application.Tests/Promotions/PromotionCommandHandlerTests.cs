@@ -12,7 +12,7 @@ public sealed class PromotionCommandHandlerTests
     public async Task Create_ThenGet_ReturnsPromotionWithRules()
     {
         await using var context = TestDbContextFactory.Create();
-        var createHandler = new CreatePromotionCommandHandler(context);
+        var createHandler = new CreatePromotionCommandHandler(context, new FakeCurrentAdminService());
 
         var id = await createHandler.Handle(
             new CreatePromotionCommand(
@@ -27,19 +27,20 @@ public sealed class PromotionCommandHandlerTests
         promotion.Name.Should().Be("Weekend offer");
         promotion.IsActive.Should().BeTrue();
         promotion.Rules.Should().ContainSingle(r => r.MinimumHours == 2 && r.DiscountValue == 12m);
+        context.AuditLogs.Should().ContainSingle(a => a.Action == "Create" && a.EntityType == "Promotion" && a.EntityId == id);
     }
 
     [Fact]
     public async Task Update_ReplacesNameRulesAndActiveState()
     {
         await using var context = TestDbContextFactory.Create();
-        var id = await new CreatePromotionCommandHandler(context).Handle(
+        var id = await new CreatePromotionCommandHandler(context, new FakeCurrentAdminService()).Handle(
             new CreatePromotionCommand(
                 "Original", true, null, null,
                 [new PricingRuleInput(1, DiscountType.FixedRate, 10m)]),
             CancellationToken.None);
 
-        var updateHandler = new UpdatePromotionCommandHandler(context);
+        var updateHandler = new UpdatePromotionCommandHandler(context, new FakeCurrentAdminService());
         var updated = await updateHandler.Handle(
             new UpdatePromotionCommand(
                 id, "Renamed", false, null, null,
@@ -49,13 +50,14 @@ public sealed class PromotionCommandHandlerTests
         updated.Name.Should().Be("Renamed");
         updated.IsActive.Should().BeFalse();
         updated.Rules.Should().ContainSingle(r => r.MinimumHours == 3 && r.DiscountType == "Percentage" && r.DiscountValue == 20m);
+        context.AuditLogs.Should().ContainSingle(a => a.Action == "Update" && a.EntityType == "Promotion" && a.EntityId == id);
     }
 
     [Fact]
     public async Task Update_ThrowsNotFoundException_WhenPromotionDoesNotExist()
     {
         await using var context = TestDbContextFactory.Create();
-        var handler = new UpdatePromotionCommandHandler(context);
+        var handler = new UpdatePromotionCommandHandler(context, new FakeCurrentAdminService());
 
         var act = () => handler.Handle(
             new UpdatePromotionCommand(999, "X", true, null, null, []),

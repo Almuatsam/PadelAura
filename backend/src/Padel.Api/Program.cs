@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Padel.Api.Common;
 using Padel.Api.Middleware;
 using Padel.Application;
+using Padel.Application.Common.Interfaces;
 using Padel.Infrastructure;
 using Padel.Infrastructure.Persistence;
 using Padel.Infrastructure.Persistence.Seed;
@@ -48,6 +50,9 @@ builder.Services
         };
     });
 builder.Services.AddAuthorization();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentAdminService, CurrentAdminService>();
 
 // Rate limiting on sensitive/public endpoints — required by docs/02-TDD.md's "Rate Limiting on
 // login and booking to prevent brute-force/spam booking" and extended here to the other

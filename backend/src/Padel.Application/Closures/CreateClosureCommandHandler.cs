@@ -1,3 +1,4 @@
+using System.Text.Json;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Padel.Application.Common.Exceptions;
@@ -6,7 +7,7 @@ using Padel.Domain.Entities;
 
 namespace Padel.Application.Closures;
 
-public sealed class CreateClosureCommandHandler(IApplicationDbContext context)
+public sealed class CreateClosureCommandHandler(IApplicationDbContext context, ICurrentAdminService currentAdmin)
     : IRequestHandler<CreateClosureCommand, List<long>>
 {
     public async Task<List<long>> Handle(CreateClosureCommand request, CancellationToken cancellationToken)
@@ -36,6 +37,13 @@ public sealed class CreateClosureCommandHandler(IApplicationDbContext context)
         }
 
         context.CourtClosures.AddRange(closures);
+
+        // Save first so each closure's Id is populated before it's used as the AuditLog EntityId.
+        await context.SaveChangesAsync(cancellationToken);
+
+        context.AuditLogs.AddRange(closures.Select(c => new AuditLog(
+            currentAdmin.AdminId, "Create", nameof(CourtClosure), c.Id,
+            JsonSerializer.Serialize(new { c.CourtId, c.ClosureDate, c.StartTime, c.EndTime, c.Reason }))));
 
         await context.SaveChangesAsync(cancellationToken);
 

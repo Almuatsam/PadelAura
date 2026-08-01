@@ -128,10 +128,25 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 
+// Baseline security headers on every response — clickjacking, MIME-sniffing, and referrer leakage
+// protection. No CSP yet: the API serves JSON only (no HTML rendering of its own), so a
+// content-security-policy belongs on the frontend's hosting layer, not here.
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    await next();
+});
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+else
+{
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();

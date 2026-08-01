@@ -112,7 +112,12 @@ export function PromotionsPage() {
                   <Badge variant={promotion.isActive ? "success" : "muted"}>
                     {promotion.isActive ? t("admin.promotions.active") : t("admin.courts.inactive")}
                   </Badge>
-                  <Button variant="ghost" size="icon-sm" onClick={() => openEditDialog(promotion)}>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={t("admin.promotions.edit")}
+                    onClick={() => openEditDialog(promotion)}
+                  >
                     <Pencil className="size-3.5" />
                   </Button>
                 </div>

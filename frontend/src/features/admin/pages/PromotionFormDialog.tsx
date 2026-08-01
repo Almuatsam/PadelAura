@@ -131,6 +131,7 @@ export function PromotionFormDialog({ open, onOpenChange, promotion, onSubmit, i
                     variant="ghost"
                     size="icon-sm"
                     className="mt-4"
+                    aria-label={t("admin.promotions.removeRule")}
                     onClick={() => removeRule(index)}
                     disabled={rules.length === 1}
                   >

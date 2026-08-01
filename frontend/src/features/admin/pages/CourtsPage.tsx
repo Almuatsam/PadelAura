@@ -111,10 +111,20 @@ export function CourtsPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-1">
-                      <Button variant="ghost" size="icon-sm" onClick={() => openEditDialog(court)}>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={t("admin.courts.edit")}
+                        onClick={() => openEditDialog(court)}
+                      >
                         <Pencil className="size-3.5" />
                       </Button>
-                      <Button variant="ghost" size="icon-sm" onClick={() => handleDelete(court)}>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={t("admin.courts.delete")}
+                        onClick={() => handleDelete(court)}
+                      >
                         <Trash2 className="size-3.5 text-error" />
                       </Button>
                     </div>

@@ -88,6 +88,7 @@
       "fixedRate": "Fixed rate / hour",
       "percentage": "Percentage off",
       "addRule": "Add rule",
+      "removeRule": "Remove rule",
       "save": "Save",
       "noRules": "No pricing rules yet."
     },
@@ -117,7 +118,10 @@
     "cart": {
       "title": "Your selection",
       "empty": "No time slots selected yet.",
-      "total": "Total"
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "total": "Total",
+      "remove": "Remove this time slot"
     },
     "contact": {
       "phone": "Phone number",
@@ -134,13 +138,15 @@
       "slots": "Selected times",
       "confirm": "Confirm booking",
       "conflictError": "One of your selected times was just booked by someone else. Please pick another.",
-      "genericError": "Something went wrong creating your booking. Please try again."
+      "genericError": "Something went wrong creating your booking. Please try again.",
+      "priceChangedError": "The price changed while you were reviewing your booking. Please check the total and try again."
     },
     "confirmation": {
       "loading": "Loading your booking…",
       "notFound": "We couldn't find that booking.",
       "reference": "Booking reference",
       "processing": "Waiting for payment confirmation…",
+      "refresh": "Refresh payment status",
       "paymentStatus": "Payment status",
       "status": {
         "Pending": "Pending",

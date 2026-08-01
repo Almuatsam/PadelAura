@@ -1,45 +1,53 @@
-# منصة حجز ملاعب البادل (Padel Booking Platform)
+# PadelAura — Padel Court Booking Platform
 
-منصة إلكترونية ثنائية اللغة (عربي / إنجليزي) لحجز ملاعب البادل، بدون حاجة لإنشاء حساب من طرف العميل، مع لوحة تحكم كاملة للإدارة.
+A bilingual (Arabic/English) padel court booking platform. Customers browse availability and book
+courts without creating an account; admins manage courts, schedules, closures, pricing, promotions,
+and bookings through a separate authenticated panel.
 
-> **حالة المشروع الحالية:** قيد التطوير — راجع [`docs/06-Engineering-Plan.md`](./docs/06-Engineering-Plan.md) لمعرفة آخر مرحلة مكتملة.
-> وثائق التخطيط الكاملة (PRD, TDD, App Flow, DB Schema, Design Brief, API Spec) موجودة في مجلد [`docs/`](./docs/).
+Built as a timed technical assessment. All planned phases (setup through QA) are complete, plus a
+dedicated security hardening pass. Full specs live in [`docs/`](./docs/): [`01-PRD.md`](./docs/01-PRD.md),
+[`02-TDD.md`](./docs/02-TDD.md), [`03-App-Flow.md`](./docs/03-App-Flow.md),
+[`04-Backend-Schema.md`](./docs/04-Backend-Schema.md), [`05-Design-Brief.md`](./docs/05-Design-Brief.md),
+[`06-Engineering-Plan.md`](./docs/06-Engineering-Plan.md), [`07-API-Spec.yaml`](./docs/07-API-Spec.yaml),
+and [`08-Security-Hardening.md`](./docs/08-Security-Hardening.md) (what was hardened, and the
+trade-offs deliberately left as documented decisions rather than fixed under deadline pressure).
 
----
+## Tech stack
 
-## التقنيات المستخدمة (Tech Stack)
-
-| الطبقة | التقنية |
+| Layer | Technology |
 |---|---|
-| Backend | ASP.NET Core 8 Web API (Clean Architecture: Api / Application / Domain / Infrastructure) |
-| ORM | Entity Framework Core 8 + Pomelo.EntityFrameworkCore.MySql |
-| قاعدة البيانات | MySQL 8 (عبر Docker Compose) |
-| Frontend | React 18 + TypeScript + Vite + Tailwind CSS v4 + shadcn/ui |
-| Auth | JWT Bearer (لوحة التحكم فقط) + BCrypt |
-| Validation | FluentValidation |
-| CQRS | MediatR (v12 — النسخة المجانية آخر إصدار قبل تغيير الترخيص) |
-| الدفع | بوابة Thawani (Sandbox) |
-| التوثيق (API) | Swagger / OpenAPI 3 |
+| Backend | ASP.NET Core 8 Web API — Clean Architecture (Domain → Application → Infrastructure → Api) |
+| CQRS | MediatR 12.4.1 (pinned — v13+ requires a paid commercial license) |
+| Validation | FluentValidation, run automatically via a MediatR pipeline behavior |
+| ORM | Entity Framework Core 8 + Pomelo MySQL provider |
+| Database | MySQL 8 (Docker Compose, bound to `127.0.0.1` only) |
+| Auth | JWT Bearer (admin panel only) + BCrypt password hashing |
+| Payments | Thawani checkout API (sandbox) |
+| Testing | xUnit + FluentAssertions + NSubstitute + EF Core InMemory (57 tests) |
+| Frontend | React 19 + TypeScript + Vite + Tailwind CSS v4 |
+| Frontend data/forms | TanStack Query, react-hook-form + zod, axios |
+| i18n | i18next / react-i18next (English + Arabic, full RTL support) |
+| UI | shadcn/ui conventions on radix-ui primitives (hand-written, not CLI-generated) |
+| CI | GitHub Actions — backend build/test/dependency-audit, frontend build/lint |
 
----
+## Getting started
 
-## خطوات التشغيل (Getting Started)
-
-### المتطلبات
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) (أو أحدث، بشرط توفر net8.0 runtime)
+### Prerequisites
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - [Node.js](https://nodejs.org/) 20+
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-### 1) قاعدة البيانات (MySQL عبر Docker)
+### 1. Database (MySQL via Docker)
 
 ```bash
 cp .env.example .env
-# عدّل القيم داخل .env إذا لزم (خصوصًا إذا كان المنفذ 3306 مستخدمًا محليًا لديك — 
-# افتراضيًا نستخدم المنفذ 3307 لتفادي أي تعارض مع تثبيت MySQL محلي)
 docker compose up -d
 ```
 
-### 2) الباكند (ASP.NET Core API)
+MySQL listens on `127.0.0.1:3307` by default (not the standard 3306, to avoid clashing with a local
+MySQL install) and is not reachable from outside the host.
+
+### 2. Backend (ASP.NET Core API)
 
 ```bash
 cd backend
@@ -47,55 +55,97 @@ dotnet restore
 dotnet ef database update --project src/Padel.Infrastructure --startup-project src/Padel.Api
 dotnet run --project src/Padel.Api
 ```
-سيعمل الـ API افتراضيًا على `https://localhost:5xxx` مع Swagger UI متاح في بيئة التطوير على `/swagger`.
 
-> ملاحظة: تأكد من تحديث connection string في `backend/src/Padel.Api/appsettings.Development.json` ليطابق المنفذ الذي اخترته في `.env`.
+Runs at `http://localhost:5109`, with Swagger UI at `/swagger` in Development. Migrations and
+database seeding (courts + a promotion, always; a default admin, only in Development — see below)
+run automatically on startup, so no separate manual migration step is required to boot locally.
 
-### 3) الفرونت اند (React)
+`backend/src/Padel.Api/appsettings.Development.json` already points at the Docker Compose database
+and Thawani's public UAT sandbox keys, so no edits are needed for local development. To run the 57
+backend tests:
+
+```bash
+dotnet test
+```
+
+### 3. Frontend (React + Vite)
 
 ```bash
 cd frontend
+cp .env.example .env   # points VITE_API_BASE_URL at the backend above
 npm install
 npm run dev
 ```
-سيعمل تطبيق الويب افتراضيًا على `http://localhost:5173`.
 
----
+Runs at `http://localhost:5173`.
 
-## بيانات الدخول إلى لوحة التحكم (Admin Credentials)
+## Admin panel credentials
 
-يتم إنشاء حساب مدير افتراضي تلقائيًا عند أول تشغيل للـ API (seed data):
+A default admin account is seeded automatically **only in the Development environment**
+(`Seed:CreateDefaultAdmin: true` in `appsettings.Development.json`; unset/`false` in production):
 
-| الحقل | القيمة |
+| Field | Value |
 |---|---|
-| البريد الإلكتروني | `admin@padel.local` |
-| كلمة المرور | `Padel@12345` |
+| Email | `admin@padel.local` |
+| Password | `Padel@12345` |
 
-> ⚠️ هذه بيانات دخول تجريبية لأغراض التقييم فقط — يجب تغييرها قبل أي استخدام إنتاجي حقيقي.
+Login at `/admin/login`. This is a local-evaluation-only credential — it must be rotated (or the
+seed flag left off) before any non-local deployment; see
+[`docs/08-Security-Hardening.md`](./docs/08-Security-Hardening.md) for the reasoning.
 
----
+## Core routes
 
-## هيكلة المشروع
+- **Customer** (public, no account required): `/` (landing), `/book` (date/slot picker → cart →
+  contact & payment → review), `/booking/:reference` (confirmation page, also where Thawani
+  redirects back to after checkout).
+- **Admin** (JWT-protected, `/admin/*`): Dashboard, Courts, Closures, Bookings, Promotions.
+
+## Key design decisions
+
+- **Court identity is hidden from customers.** Availability and booking confirmation only ever
+  expose a time slot, never which physical court was assigned — admin views intentionally do show
+  it.
+- **Random court assignment**, chosen at booking-confirmation time among all eligible courts for
+  that slot (not first-available).
+- **Race-safe booking.** Court assignment and booking creation happen inside a transaction using
+  `SELECT ... FOR UPDATE` row/gap locking, so concurrent requests can never double-book the same
+  court/slot — verified under live concurrent-request load testing, not just unit tests.
+- **Pending online payments** only hold a slot for a grace window before being reclaimed, so an
+  abandoned checkout can't squat on a court indefinitely.
+
+## Project structure
 
 ```
 PadelAura/
 ├── backend/            # ASP.NET Core 8 solution (Clean Architecture)
 │   └── src/
-│       ├── Padel.Api/
-│       ├── Padel.Application/
-│       ├── Padel.Domain/
-│       └── Padel.Infrastructure/
+│       ├── Padel.Api/           # composition root, controllers, middleware
+│       ├── Padel.Application/   # CQRS handlers, validators, DTOs (MediatR)
+│       ├── Padel.Domain/        # entities, no external dependencies
+│       └── Padel.Infrastructure/# EF Core, MySQL, JWT, BCrypt, Thawani client
 ├── frontend/           # React + Vite + TypeScript SPA
-├── database/           # ملفات قاعدة البيانات (mysql-data محلي عبر docker volume)
-├── docs/               # وثائق التخطيط الكاملة (PRD, TDD, ERD, API Spec, ...)
-├── docker-compose.yml  # MySQL container
+├── database/           # local MySQL data volume (Docker)
+├── docs/               # PRD, TDD, app flow, DB schema, design brief, API spec, security notes
+├── docker-compose.yml  # MySQL container (localhost-bound)
 └── .env.example
 ```
 
----
+## Security notes
 
-## ملاحظات إضافية
+A dedicated hardening pass covered rate limiting (login/booking/lookup/availability/webhook),
+gating the default admin seed, a login timing side-channel fix, a shortened JWT lifetime, a booking
+cart size cap, admin action audit logging, hardening the codebase's one raw-SQL call, baseline
+security response headers + HSTS, and localhost-only dev database binding, plus a CI pipeline that
+fails the build on known-vulnerable NuGet packages. A handful of larger changes — enforcing the
+existing RBAC roles, moving off `localStorage` for the JWT, refresh-token rotation — were left as
+explicitly documented trade-offs rather than built under deadline pressure. Full detail, including
+*why* each trade-off was accepted, is in [`docs/08-Security-Hardening.md`](./docs/08-Security-Hardening.md).
 
-- منفذ MySQL الافتراضي في `docker-compose.yml` هو **3307** (وليس 3306) لتفادي التعارض مع أي خادم MySQL محلي مثبت مسبقًا على الجهاز.
-- تم تثبيت `MediatR` على الإصدار **12.4.1** تحديدًا (بدلاً من أحدث إصدار) لأن الإصدارات 13+ أصبحت تتطلب ترخيصًا تجاريًا مدفوعًا.
-- راجع [`docs/06-Engineering-Plan.md`](./docs/06-Engineering-Plan.md) لخطة التنفيذ الكاملة مرحلة بمرحلة، وقائمة الأولويات في حال ضاق الوقت.
+## Additional notes
+
+- MySQL's default port is **3307**, not 3306, to avoid conflicting with a locally installed MySQL
+  server.
+- `MediatR` is pinned to **12.4.1** specifically — 13+ requires a paid commercial license.
+- No frontend test runner is configured; backend logic is covered by 57 xUnit tests. HTTP-layer
+  behavior (concurrency locking, rate limiting, security headers) was verified live against the
+  running dev server rather than through a separate integration-test project.

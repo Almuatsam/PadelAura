@@ -23,11 +23,11 @@ trade-offs deliberately left as documented decisions rather than fixed under dea
 | Database | MySQL 8 (Docker Compose, bound to `127.0.0.1` only) |
 | Auth | JWT Bearer (admin panel only) + BCrypt password hashing |
 | Payments | Thawani checkout API (sandbox) |
-| Testing | xUnit + FluentAssertions + NSubstitute + EF Core InMemory (57 tests) |
+| Testing | xUnit + FluentAssertions + NSubstitute + EF Core InMemory (61 tests) |
 | Frontend | React 19 + TypeScript + Vite + Tailwind CSS v4 |
 | Frontend data/forms | TanStack Query, react-hook-form + zod, axios |
 | i18n | i18next / react-i18next (English + Arabic, full RTL support) |
-| UI | shadcn/ui conventions on radix-ui primitives (hand-written, not CLI-generated) |
+| UI | shadcn/ui conventions on radix-ui primitives (hand-written, not CLI-generated), framer-motion for interaction/motion |
 | CI | GitHub Actions — backend build/test/dependency-audit, frontend build/lint |
 
 ## Getting started
@@ -61,7 +61,7 @@ database seeding (courts + a promotion, always; a default admin, only in Develop
 run automatically on startup, so no separate manual migration step is required to boot locally.
 
 `backend/src/Padel.Api/appsettings.Development.json` already points at the Docker Compose database
-and Thawani's public UAT sandbox keys, so no edits are needed for local development. To run the 57
+and Thawani's public UAT sandbox keys, so no edits are needed for local development. To run the 61
 backend tests:
 
 ```bash
@@ -112,6 +112,11 @@ seed flag left off) before any non-local deployment; see
   court/slot — verified under live concurrent-request load testing, not just unit tests.
 - **Pending online payments** only hold a slot for a grace window before being reclaimed, so an
   abandoned checkout can't squat on a court indefinitely.
+- **"Bounce" visual identity, mobile-first.** Both customer and admin UIs share a playful
+  illustrated design system (navy/orange/amber/cream palette, Baloo 2 + Nunito Sans, jelly-blob
+  card shapes, squash-and-stretch motion via framer-motion, all reduced-motion aware) built
+  mobile-first with a bottom nav on the customer side and a responsive layout across breakpoints
+  on the admin side.
 
 ## Project structure
 
@@ -146,6 +151,6 @@ explicitly documented trade-offs rather than built under deadline pressure. Full
 - MySQL's default port is **3307**, not 3306, to avoid conflicting with a locally installed MySQL
   server.
 - `MediatR` is pinned to **12.4.1** specifically — 13+ requires a paid commercial license.
-- No frontend test runner is configured; backend logic is covered by 57 xUnit tests. HTTP-layer
+- No frontend test runner is configured; backend logic is covered by 61 xUnit tests. HTTP-layer
   behavior (concurrency locking, rate limiting, security headers) was verified live against the
   running dev server rather than through a separate integration-test project.

@@ -23,7 +23,12 @@ export function DateSlotStep({ cart, onAddSlot, onRemoveSlot, onContinue }: Prop
   const { t } = useTranslation()
   const [date, setDate] = useState(todayIso)
 
-  const { data: slots, isLoading } = useQuery({
+  const {
+    data: slots,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
     queryKey: ["availability", date],
     queryFn: () => fetchAvailability(date),
     enabled: Boolean(date),
@@ -58,34 +63,44 @@ export function DateSlotStep({ cart, onAddSlot, onRemoveSlot, onContinue }: Prop
         <p className="mb-2 text-sm text-muted-foreground">{t("customer.slots.legend")}</p>
         {isLoading && <p className="text-sm text-muted-foreground">{t("customer.slots.loading")}</p>}
 
-        {!isLoading && slots?.length === 0 && (
+        {isError && (
+          <div className="flex flex-col items-start gap-2">
+            <p className="text-sm text-error">{t("customer.slots.loadError")}</p>
+            <Button type="button" variant="outline" size="sm" onClick={() => refetch()}>
+              {t("customer.slots.retry")}
+            </Button>
+          </div>
+        )}
+
+        {!isLoading && !isError && slots?.length === 0 && (
           <p className="text-sm text-muted-foreground">{t("customer.slots.noneOpen")}</p>
         )}
 
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
-          {slots?.map((slot) => {
-            const key = slotKey(date, slot.startTime)
-            const isSelected = selectedKeys.has(key)
-            return (
-              <button
-                key={key}
-                type="button"
-                disabled={!slot.isAvailable}
-                onClick={() => toggleSlot(slot)}
-                className={cn(
-                  "flex min-h-11 items-center justify-center rounded-2xl border-2 px-2 py-2 text-sm font-bold transition-all duration-150 active:scale-90",
-                  !slot.isAvailable &&
-                    "cursor-not-allowed border-border bg-muted text-muted-foreground line-through opacity-60",
-                  slot.isAvailable &&
-                    !isSelected &&
-                    "border-border bg-card shadow-sm hover:-translate-y-0.5 hover:border-primary hover:text-primary",
-                  isSelected && "border-primary bg-primary text-primary-foreground shadow-candy-orange",
-                )}
-              >
-                {slot.startTime.slice(0, 5)}
-              </button>
-            )
-          })}
+          {!isError &&
+            slots?.map((slot) => {
+              const key = slotKey(date, slot.startTime)
+              const isSelected = selectedKeys.has(key)
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  disabled={!slot.isAvailable}
+                  onClick={() => toggleSlot(slot)}
+                  className={cn(
+                    "flex min-h-11 items-center justify-center rounded-2xl border-2 px-2 py-2 text-sm font-bold transition-all duration-150 active:scale-90",
+                    !slot.isAvailable &&
+                      "cursor-not-allowed border-border bg-muted text-muted-foreground line-through opacity-60",
+                    slot.isAvailable &&
+                      !isSelected &&
+                      "border-border bg-card shadow-sm hover:-translate-y-0.5 hover:border-primary hover:text-primary",
+                    isSelected && "border-primary bg-primary text-primary-foreground shadow-candy-orange",
+                  )}
+                >
+                  {slot.startTime.slice(0, 5)}
+                </button>
+              )
+            })}
         </div>
       </div>
 

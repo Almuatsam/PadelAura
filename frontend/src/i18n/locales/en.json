@@ -118,6 +118,8 @@
       "dateLabel": "Date",
       "legend": "Tap an available time to add it to your booking.",
       "loading": "Loading available times…",
+      "loadError": "Couldn't load times for this date.",
+      "retry": "Try again",
       "noneOpen": "No time slots are open on this date.",
       "continue": "Continue"
     },

@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
@@ -58,8 +59,8 @@ export function ClosuresPage() {
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-      <Card className="lg:col-span-1">
-        <h2 className="text-lg font-semibold">{t("admin.closures.add")}</h2>
+      <Card shape="plain" className="lg:col-span-1">
+        <h2 className="font-display text-lg font-bold">{t("admin.closures.add")}</h2>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <div className="flex items-center gap-2.5">
             <Switch checked={allCourts} onCheckedChange={setAllCourts} />
@@ -67,16 +68,18 @@ export function ClosuresPage() {
           </div>
 
           {!allCourts && (
-            <div className="flex flex-col gap-1.5 rounded-lg border border-border p-2.5">
+            <div className="flex flex-col gap-2 rounded-xl border border-border p-2.5">
               {courts?.map((court) => (
-                <label key={court.id} className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
+                <div key={court.id} className="flex items-center gap-2.5 text-sm">
+                  <Checkbox
+                    id={`closure-court-${court.id}`}
                     checked={selectedCourtIds.includes(court.id)}
-                    onChange={() => toggleCourt(court.id)}
+                    onCheckedChange={() => toggleCourt(court.id)}
                   />
-                  {court.name}
-                </label>
+                  <Label htmlFor={`closure-court-${court.id}`} className="font-normal">
+                    {court.name}
+                  </Label>
+                </div>
               ))}
             </div>
           )}
@@ -110,8 +113,8 @@ export function ClosuresPage() {
         </form>
       </Card>
 
-      <Card className="lg:col-span-2">
-        <h2 className="text-lg font-semibold">{t("admin.closures.upcoming")}</h2>
+      <Card shape="plain" className="lg:col-span-2">
+        <h2 className="font-display text-lg font-bold">{t("admin.closures.upcoming")}</h2>
         <Table>
           <TableHeader>
             <TableRow>

@@ -14,24 +14,24 @@ export function DashboardPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-semibold">{t("admin.dashboard.title")}</h1>
+      <h1 className="font-display mb-6 text-2xl font-bold">{t("admin.dashboard.title")}</h1>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card>
+        <Card shape="plain" tint="orange">
           <CardHeader>
             <CardTitle>{t("admin.dashboard.todayBookings")}</CardTitle>
           </CardHeader>
           <CardValue>{isLoading ? "…" : data?.todayBookingsCount}</CardValue>
         </Card>
 
-        <Card>
+        <Card shape="plain" tint="amber">
           <CardHeader>
             <CardTitle>{t("admin.dashboard.todayRevenue")}</CardTitle>
           </CardHeader>
           <CardValue>{isLoading ? "…" : `${data?.todayRevenue.toFixed(3)} OMR`}</CardValue>
         </Card>
 
-        <Card>
+        <Card shape="plain" tint="navy">
           <CardHeader>
             <CardTitle>{t("admin.dashboard.occupancy")}</CardTitle>
           </CardHeader>

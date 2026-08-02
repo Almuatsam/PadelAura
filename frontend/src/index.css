@@ -1,25 +1,20 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "@fontsource-variable/geist";
+
+/* Bounce direction: two font pairs (display+body), one per language, each self-hosted via
+   Fontsource like the font this replaces. This is 4 font families total, above the usual
+   "max two families" guidance — deliberate exception: this is a bilingual EN/AR product and
+   only one pair loads/renders per active language (see the --font-*-base swap below), not
+   all four at once. Arabic weights are imported as arabic-only subset files (not the full
+   latin+arabic bundle) to keep the CSS/font payload down. */
+@import "@fontsource-variable/baloo-2";
+@import "@fontsource-variable/nunito-sans";
+@import "@fontsource/baloo-bhaijaan-2/arabic-600.css";
+@import "@fontsource/baloo-bhaijaan-2/arabic-700.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-400.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-600.css";
 
 @custom-variant dark (&:is(.dark *));
-
-@theme {
-  --font-sans: "Inter", "IBM Plex Sans Arabic", system-ui, sans-serif;
-
-  --color-primary: #0e7a53;
-  --color-primary-light: #18a777;
-  --color-background: #f5f7f8;
-  --color-surface: #ffffff;
-  --color-text-primary: #202124;
-  /* Darkened from the original #18a777/#f5a623/#e5484d — those measured ~3.1:1 / ~2.0:1 / ~3.9:1
-     contrast against white, failing WCAG AA's 4.5:1 for normal text (these are used as text color
-     on their own light tint backgrounds in badges/toasts, and as plain error text elsewhere). Each
-     shade below keeps the same hue but passes >= 4.5:1. */
-  --color-success: #0f6b4f;
-  --color-warning: #8a5a05;
-  --color-error: #c1272d;
-}
 
 @layer base {
   html {
@@ -46,8 +41,11 @@
 }
 
 @theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: 'Geist Variable', sans-serif;
+  --font-display: var(--font-display-base);
+  --font-sans: var(--font-sans-base);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -88,71 +86,156 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Jelly-blob shapes: Tailwind's --radius-* scale is a single scalar and can't express an
+   uneven per-corner radius, so these are a small fixed set of full border-radius shorthands
+   instead. Reserved for card/panel containers, never interactive tap targets (which stay on
+   the predictable --radius-* pill scale) so hit-shapes remain rectangular/circular. */
 :root {
-  --background: #f5f7f8;
-  --foreground: #202124;
-  --card: #ffffff;
-  --card-foreground: #202124;
-  --popover: #ffffff;
-  --popover-foreground: #202124;
-  --primary: #0e7a53;
-  --primary-foreground: #ffffff;
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: #202124;
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.95 0.02 165);
-  --accent-foreground: #0e7a53;
-  --destructive: #e5484d;
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: #18a777;
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --blob-1: 63% 37% 54% 46% / 55% 45% 55% 45%;
+  --blob-2: 42% 58% 63% 37% / 41% 44% 56% 59%;
+  --blob-3: 55% 45% 40% 60% / 60% 40% 55% 45%;
+  --blob-4: 38% 62% 55% 45% / 52% 48% 40% 60%;
+}
+@utility rounded-blob-1 { border-radius: var(--blob-1); }
+@utility rounded-blob-2 { border-radius: var(--blob-2); }
+@utility rounded-blob-3 { border-radius: var(--blob-3); }
+@utility rounded-blob-4 { border-radius: var(--blob-4); }
+
+/* Candy-colored soft shadows: tint always matches the fill of the element casting the
+   shadow (an orange button gets shadow-candy-orange, an amber card gets shadow-candy-amber,
+   etc.) — never pair a tinted shadow with an unrelated fill hue. */
+:root {
+  --shadow-candy-orange: 0 8px 24px -4px rgba(242, 92, 5, 0.35), 0 2px 8px -2px rgba(242, 92, 5, 0.25);
+  --shadow-candy-amber: 0 8px 24px -4px rgba(255, 193, 69, 0.4), 0 2px 8px -2px rgba(255, 193, 69, 0.3);
+  --shadow-candy-navy: 0 8px 24px -4px rgba(34, 34, 59, 0.3), 0 2px 8px -2px rgba(34, 34, 59, 0.2);
+  --shadow-candy-slate: 0 6px 20px -4px rgba(74, 101, 114, 0.3), 0 2px 8px -2px rgba(74, 101, 114, 0.2);
+}
+@utility shadow-candy-orange { box-shadow: var(--shadow-candy-orange); }
+@utility shadow-candy-amber { box-shadow: var(--shadow-candy-amber); }
+@utility shadow-candy-navy { box-shadow: var(--shadow-candy-navy); }
+@utility shadow-candy-slate { box-shadow: var(--shadow-candy-slate); }
+
+:root {
+  /* Squash-and-stretch tap-spring intensity, consumed by motion.button/Card whileTap configs
+     via useBounceScale(). Dialed down under .admin-scope (see AdminLayout) without needing a
+     second set of interactive-primitive variants. */
+  --bounce-scale: 1;
+
+  /* Display: Baloo 2 (Latin) / Baloo Bhaijaan 2 (Arabic) — bouncy, bold, a true sibling pair.
+     Body: Nunito Sans (Latin) / IBM Plex Sans Arabic (Arabic). Swapped by :root[dir="rtl"]
+     below so every component can just write font-display/font-sans with zero per-file
+     RTL branching. */
+  --font-display-base: "Baloo 2 Variable", "Baloo Bhaijaan 2", system-ui, sans-serif;
+  --font-sans-base: "Nunito Sans Variable", "IBM Plex Sans Arabic", system-ui, sans-serif;
+
+  --background: #f2e8cf;
+  --foreground: #22223b;
+  --card: #fbf7ec;
+  --card-foreground: #22223b;
+  --popover: #fbf7ec;
+  --popover-foreground: #22223b;
+  --primary: #f25c05;
+  /* Navy, not white, on orange/amber brand fills: measured contrast is 4.64:1 (navy) vs
+     3.33:1 (white) against #F25C05, and 9.69:1 vs 1.59:1 against #FFC145 — navy passes AA
+     for normal text on both brand colors, white does not. */
+  --primary-foreground: #22223b;
+  --secondary: #ffc145;
+  --secondary-foreground: #22223b;
+  --muted: #ede3c8;
+  --muted-foreground: #4a6572;
+  --accent: #ffc145;
+  --accent-foreground: #22223b;
+  --destructive: #c1272d;
+  --border: #e4d7b0;
+  --input: #e4d7b0;
+  --ring: #f25c05;
+  /* Same hues the previous theme already tuned for >=4.5:1 AA text contrast (see the removed
+     Block-A comment history) — re-verified here against the new cream card bg (#FBF7EC,
+     luminance ~0.81): success 5.32:1, warning 4.86:1, error 4.79:1. Kept as-is rather than
+     re-inventing already-correct values. */
+  --success: #0f6b4f;
+  --warning: #8a5a05;
+  --error: #c1272d;
+  --chart-1: #f25c05;
+  --chart-2: #ffc145;
+  --chart-3: #22223b;
+  --chart-4: #4a6572;
+  --chart-5: #b0855f;
   --radius: 0.75rem;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #202124;
-  --sidebar-primary: #0e7a53;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: oklch(0.95 0.02 165);
-  --sidebar-accent-foreground: #0e7a53;
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: #18a777;
+  --sidebar: #fbf7ec;
+  --sidebar-foreground: #22223b;
+  --sidebar-primary: #f25c05;
+  --sidebar-primary-foreground: #22223b;
+  --sidebar-accent: #ede3c8;
+  --sidebar-accent-foreground: #22223b;
+  --sidebar-border: #e4d7b0;
+  --sidebar-ring: #f25c05;
+}
+
+:root[dir="rtl"] {
+  --font-display-base: "Baloo Bhaijaan 2", "Baloo 2 Variable", system-ui, sans-serif;
+  --font-sans-base: "IBM Plex Sans Arabic", "Nunito Sans Variable", system-ui, sans-serif;
 }
 
 .dark {
-  --background: #121417;
-  --foreground: oklch(0.985 0 0);
-  --card: #1b1e22;
-  --card-foreground: oklch(0.985 0 0);
-  --popover: #1b1e22;
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: #18a777;
-  --primary-foreground: #121417;
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.27 0.03 165);
-  --accent-foreground: #18a777;
-  --destructive: #e5484d;
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: #18a777;
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: #1b1e22;
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: #18a777;
-  --sidebar-primary-foreground: #121417;
-  --sidebar-accent: oklch(0.27 0.03 165);
-  --sidebar-accent-foreground: #18a777;
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: #18a777;
+  --background: #22223b;
+  --foreground: #f2e8cf;
+  --card: #2c2c4a;
+  --card-foreground: #f2e8cf;
+  --popover: #2c2c4a;
+  --popover-foreground: #f2e8cf;
+  --primary: #f25c05;
+  --primary-foreground: #22223b;
+  --secondary: #ffc145;
+  --secondary-foreground: #22223b;
+  --muted: #32324f;
+  /* Lightened from the light-mode slate #4A6572 (which measures only 2.5:1 on this navy bg)
+     to #B8C4CC, which measures ~8.7:1 — same hue family, tuned for AA on a dark ground. */
+  --muted-foreground: #b8c4cc;
+  --accent: #ffc145;
+  --accent-foreground: #22223b;
+  --destructive: #e5716b;
+  --border: rgba(242, 232, 207, 0.12);
+  --input: rgba(242, 232, 207, 0.16);
+  --ring: #f25c05;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --error: #f87171;
+  --chart-1: #f25c05;
+  --chart-2: #ffc145;
+  --chart-3: #f2e8cf;
+  --chart-4: #b8c4cc;
+  --chart-5: #b0855f;
+  --sidebar: #2c2c4a;
+  --sidebar-foreground: #f2e8cf;
+  --sidebar-primary: #f25c05;
+  --sidebar-primary-foreground: #22223b;
+  --sidebar-accent: #32324f;
+  --sidebar-accent-foreground: #f2e8cf;
+  --sidebar-border: rgba(242, 232, 207, 0.12);
+  --sidebar-ring: #f25c05;
+}
+
+/* Admin "calm variant": same tokens, lower bounce/ornamentation intensity. Applied once on
+   AdminLayout's root wrapper. Token-suppressible intensity (radius, tap-spring magnitude,
+   shadow glow) is handled here; structural restraint (Card always uses shape="plain", admin
+   JSX never imports components/illustrations/*) is a convention enforced by review, since a
+   CSS variable can't retroactively remove hand-placed decorative markup. */
+@keyframes bounce-ball {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  40% { transform: translateY(-55%) scaleY(1.05); }
+  55% { transform: translateY(0) scaleY(0.82); }
+  75% { transform: translateY(-18%) scaleY(1.02); }
+}
+@utility animate-bounce-ball {
+  animation: bounce-ball 0.9s cubic-bezier(0.3, 0.8, 0.4, 1) infinite;
+}
+
+.admin-scope {
+  --radius: 0.6rem;
+  --bounce-scale: 0.4;
+  --shadow-candy-orange: 0 2px 6px -2px rgba(242, 92, 5, 0.15);
+  --shadow-candy-amber: 0 2px 6px -2px rgba(255, 193, 69, 0.15);
+  --shadow-candy-navy: 0 2px 6px -2px rgba(34, 34, 59, 0.15);
+  --shadow-candy-slate: 0 2px 6px -2px rgba(74, 101, 114, 0.15);
 }

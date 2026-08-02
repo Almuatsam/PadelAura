@@ -100,6 +100,10 @@
   },
   "customer": {
     "back": "Back",
+    "nav": {
+      "home": "Home",
+      "book": "Book"
+    },
     "landing": {
       "title": "Book your padel court in minutes",
       "subtitle": "Pick a time, no account needed. Pay online or at the club.",

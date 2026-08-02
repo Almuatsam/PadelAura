@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/lib/auth"
+import { BounceScaleContext } from "@/lib/bounceScale"
 import { login, loginSchema, type LoginInput } from "@/features/admin/api/auth"
 
 export function LoginPage() {
@@ -33,10 +34,13 @@ export function LoginPage() {
   const onSubmit = (input: LoginInput) => mutation.mutate(input)
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-sm">
-        <h1 className="text-xl font-semibold text-primary">{t("admin.login.title")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t("admin.login.subtitle")}</p>
+    // Not nested under AdminLayout (this route sits outside ProtectedRoute), so the calm
+    // admin scope is applied directly here rather than inherited.
+    <BounceScaleContext.Provider value={0.4}>
+      <div className="admin-scope flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-candy-navy">
+          <h1 className="font-display text-xl font-bold text-primary">{t("admin.login.title")}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t("admin.login.subtitle")}</p>
 
         <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-1.5">
@@ -63,7 +67,8 @@ export function LoginPage() {
             {t("admin.login.submit")}
           </Button>
         </form>
+        </div>
       </div>
-    </div>
+    </BounceScaleContext.Provider>
   )
 }

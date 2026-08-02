@@ -11,13 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
 import { fetchCourts } from "@/features/admin/api/courts"
 import { fetchAdminBookings, type AdminBooking } from "@/features/admin/api/bookings"
-
-const statusVariant: Record<AdminBooking["status"], "warning" | "success" | "error" | "muted"> = {
-  Pending: "warning",
-  Confirmed: "success",
-  Cancelled: "error",
-  Completed: "muted",
-}
+import { statusVariant } from "@/lib/statusVariant"
 
 export function BookingsPage() {
   const { t } = useTranslation()
@@ -46,7 +40,7 @@ export function BookingsPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-semibold">{t("admin.bookings.title")}</h1>
+      <h1 className="font-display mb-6 text-2xl font-bold">{t("admin.bookings.title")}</h1>
 
       {/* Fluid on mobile (stacked, full-width); fixed once there's room from sm up */}
       <div className="mb-4 flex flex-wrap gap-3 rounded-2xl border border-border bg-card p-4">
@@ -162,6 +156,7 @@ export function BookingsPage() {
           bookings?.map((booking) => (
             <Card
               key={booking.id}
+              shape="plain"
               className="cursor-pointer gap-2 p-4"
               onClick={() => setExpandedId(expandedId === booking.id ? null : booking.id)}
             >

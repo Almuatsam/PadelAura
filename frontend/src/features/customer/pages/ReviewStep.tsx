@@ -69,7 +69,7 @@ export function ReviewStep({ cart, contact, paymentMethod, onBack, onConflict }:
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6 px-4 py-10">
       <div>
-        <h2 className="mb-2 font-medium">{t("customer.review.slots")}</h2>
+        <h2 className="font-display mb-2 font-bold">{t("customer.review.slots")}</h2>
         <CartSummary cart={cart} />
       </div>
 

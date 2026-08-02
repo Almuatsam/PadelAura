@@ -79,7 +79,7 @@ export function PromotionsPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{t("admin.promotions.title")}</h1>
+        <h1 className="font-display text-2xl font-bold">{t("admin.promotions.title")}</h1>
         <Button onClick={openCreateDialog}>
           <Plus className="size-4" />
           {t("admin.promotions.add")}
@@ -89,10 +89,10 @@ export function PromotionsPage() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {!isLoading &&
           promotions?.map((promotion) => (
-            <Card key={promotion.id}>
+            <Card key={promotion.id} shape="plain">
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold">{promotion.name}</h2>
+                  <h2 className="font-display text-lg font-bold">{promotion.name}</h2>
                   {promotion.rules.length === 0 ? (
                     <p className="text-sm text-muted-foreground">{t("admin.promotions.noRules")}</p>
                   ) : (

@@ -29,7 +29,7 @@ export function CartSummary({ cart, onRemove }: Props) {
         {sorted.map((slot) => (
           <li
             key={`${slot.date}_${slot.startTime}`}
-            className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2 text-sm"
+            className="flex items-center justify-between rounded-2xl border border-border bg-card px-3.5 py-2.5 text-sm"
           >
             <span>
               {slot.date} · {slot.startTime.slice(0, 5)}–{slot.endTime.slice(0, 5)}

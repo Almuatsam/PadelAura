@@ -81,7 +81,7 @@ export function CourtsPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{t("admin.courts.title")}</h1>
+        <h1 className="font-display text-2xl font-bold">{t("admin.courts.title")}</h1>
         <Button onClick={openCreateDialog}>
           <Plus className="size-4" />
           {t("admin.courts.add")}

@@ -6,14 +6,10 @@ import { RefreshCw } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { fetchBookingByReference, type BookingStatus } from "@/features/customer/api/booking"
-
-const statusVariant: Record<BookingStatus["status"], "warning" | "success" | "error" | "muted"> = {
-  Pending: "warning",
-  Confirmed: "success",
-  Cancelled: "error",
-  Completed: "muted",
-}
+import { Spinner } from "@/components/ui/spinner"
+import { ConfettiBurst } from "@/components/ui/confetti-burst"
+import { fetchBookingByReference } from "@/features/customer/api/booking"
+import { statusVariant } from "@/lib/statusVariant"
 
 export function BookingConfirmationPage() {
   const { t } = useTranslation()
@@ -39,27 +35,32 @@ export function BookingConfirmationPage() {
     booking.status === "Pending" && booking.paymentMethod === "Online" && paymentStatusParam !== "cancelled"
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-6 px-4 py-10">
-      <Card className="items-center text-center">
+    <div className="relative mx-auto flex max-w-md flex-col gap-6 px-4 py-10">
+      <ConfettiBurst trigger={booking.status === "Confirmed"} />
+
+      <Card shape="blob-1" tint="orange" className="items-center gap-2 text-center">
         <p className="text-sm text-muted-foreground">{t("customer.confirmation.reference")}</p>
-        <p className="text-2xl font-semibold tracking-wide">{booking.bookingReference}</p>
+        <p className="font-display text-3xl font-bold tracking-wide">{booking.bookingReference}</p>
         <Badge variant={statusVariant[booking.status]}>
           {t(`customer.confirmation.status.${booking.status}`)}
         </Badge>
       </Card>
 
       {isStillProcessing && (
-        <div className="flex items-center justify-between rounded-lg border border-warning/20 bg-warning/10 p-3 text-sm text-warning">
+        <div className="flex items-center justify-between rounded-2xl border border-warning/20 bg-warning/10 p-3 text-sm text-warning">
           <span>{t("customer.confirmation.processing")}</span>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={t("customer.confirmation.refresh")}
-            onClick={() => void refetch()}
-            disabled={isFetching}
-          >
-            <RefreshCw className={isFetching ? "size-4 animate-spin" : "size-4"} />
-          </Button>
+          {isFetching ? (
+            <Spinner label={t("customer.confirmation.refresh")} />
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={t("customer.confirmation.refresh")}
+              onClick={() => void refetch()}
+            >
+              <RefreshCw className="size-4" />
+            </Button>
+          )}
         </div>
       )}
 
@@ -77,12 +78,12 @@ export function BookingConfirmationPage() {
       </div>
 
       <div>
-        <h2 className="mb-2 font-medium">{t("customer.review.slots")}</h2>
+        <h2 className="font-display mb-2 font-bold">{t("customer.review.slots")}</h2>
         <ul className="flex flex-col gap-1.5">
           {booking.slots.map((slot) => (
             <li
               key={`${slot.date}_${slot.startTime}`}
-              className="rounded-lg border border-border bg-card px-3 py-2 text-sm"
+              className="rounded-2xl border border-border bg-card px-3.5 py-2.5 text-sm"
             >
               {slot.date} · {slot.startTime.slice(0, 5)}–{slot.endTime.slice(0, 5)}
             </li>

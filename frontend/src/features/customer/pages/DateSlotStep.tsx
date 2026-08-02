@@ -73,10 +73,13 @@ export function DateSlotStep({ cart, onAddSlot, onRemoveSlot, onContinue }: Prop
                 disabled={!slot.isAvailable}
                 onClick={() => toggleSlot(slot)}
                 className={cn(
-                  "flex min-h-11 items-center justify-center rounded-lg border px-2 py-2 text-sm font-medium transition-colors",
-                  !slot.isAvailable && "cursor-not-allowed border-border bg-muted text-muted-foreground line-through",
-                  slot.isAvailable && !isSelected && "border-border bg-card hover:border-primary hover:text-primary",
-                  isSelected && "border-primary bg-primary text-primary-foreground",
+                  "flex min-h-11 items-center justify-center rounded-2xl border-2 px-2 py-2 text-sm font-bold transition-all duration-150 active:scale-90",
+                  !slot.isAvailable &&
+                    "cursor-not-allowed border-border bg-muted text-muted-foreground line-through opacity-60",
+                  slot.isAvailable &&
+                    !isSelected &&
+                    "border-border bg-card shadow-sm hover:-translate-y-0.5 hover:border-primary hover:text-primary",
+                  isSelected && "border-primary bg-primary text-primary-foreground shadow-candy-orange",
                 )}
               >
                 {slot.startTime.slice(0, 5)}
@@ -87,7 +90,7 @@ export function DateSlotStep({ cart, onAddSlot, onRemoveSlot, onContinue }: Prop
       </div>
 
       <div>
-        <h2 className="mb-2 font-medium">{t("customer.cart.title")}</h2>
+        <h2 className="font-display mb-2 font-bold">{t("customer.cart.title")}</h2>
         <CartSummary cart={cart} onRemove={onRemoveSlot} />
       </div>
 

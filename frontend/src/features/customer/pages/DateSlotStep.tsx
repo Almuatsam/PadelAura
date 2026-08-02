@@ -50,7 +50,7 @@ export function DateSlotStep({ cart, onAddSlot, onRemoveSlot, onContinue }: Prop
           min={todayIso}
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-48"
+          className="w-full sm:w-48"
         />
       </div>
 

@@ -5,6 +5,7 @@ import { ChevronDown, ChevronRight } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
@@ -47,9 +48,10 @@ export function BookingsPage() {
     <div>
       <h1 className="mb-6 text-2xl font-semibold">{t("admin.bookings.title")}</h1>
 
+      {/* Fluid on mobile (stacked, full-width); fixed once there's room from sm up */}
       <div className="mb-4 flex flex-wrap gap-3 rounded-2xl border border-border bg-card p-4">
         <Select value={courtId} onValueChange={(value) => { setCourtId(value); setPage(1) }}>
-          <SelectTrigger className="w-40"><SelectValue placeholder={t("admin.bookings.filters.court")} /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder={t("admin.bookings.filters.court")} /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t("admin.bookings.filters.allCourts")}</SelectItem>
             {courts?.map((court) => (
@@ -60,13 +62,13 @@ export function BookingsPage() {
 
         <Input
           type="date"
-          className="w-40"
+          className="w-full sm:w-40"
           value={date}
           onChange={(e) => { setDate(e.target.value); setPage(1) }}
         />
 
         <Select value={status} onValueChange={(value) => { setStatus(value); setPage(1) }}>
-          <SelectTrigger className="w-40"><SelectValue placeholder={t("admin.bookings.filters.status")} /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder={t("admin.bookings.filters.status")} /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t("admin.bookings.filters.allStatuses")}</SelectItem>
             <SelectItem value="Pending">Pending</SelectItem>
@@ -77,7 +79,7 @@ export function BookingsPage() {
         </Select>
 
         <Select value={paymentMethod} onValueChange={(value) => { setPaymentMethod(value); setPage(1) }}>
-          <SelectTrigger className="w-40"><SelectValue placeholder={t("admin.bookings.filters.paymentMethod")} /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder={t("admin.bookings.filters.paymentMethod")} /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t("admin.bookings.filters.allMethods")}</SelectItem>
             <SelectItem value="PayOnArrival">Pay on Arrival</SelectItem>
@@ -86,14 +88,15 @@ export function BookingsPage() {
         </Select>
 
         <Input
-          className="w-40"
+          className="w-full sm:w-40"
           placeholder={t("admin.bookings.filters.phone")}
           value={phone}
           onChange={(e) => { setPhone(e.target.value); setPage(1) }}
         />
       </div>
 
-      <div className="rounded-2xl border border-border bg-card">
+      {/* Table from sm up */}
+      <div className="hidden rounded-2xl border border-border bg-card sm:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -148,6 +151,43 @@ export function BookingsPage() {
               ))}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Card list below sm — a 7-column table would only be readable via horizontal scroll */}
+      <div className="flex flex-col gap-3 sm:hidden">
+        {!isLoading && bookings?.length === 0 && (
+          <p className="py-6 text-center text-sm text-muted-foreground">{t("admin.bookings.noResults")}</p>
+        )}
+        {!isLoading &&
+          bookings?.map((booking) => (
+            <Card
+              key={booking.id}
+              className="cursor-pointer gap-2 p-4"
+              onClick={() => setExpandedId(expandedId === booking.id ? null : booking.id)}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-medium">{booking.bookingReference}</span>
+                <Badge variant={statusVariant[booking.status]}>{booking.status}</Badge>
+              </div>
+              <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
+                <span>{booking.customerName ?? booking.customerPhone}</span>
+                <span>{booking.paymentMethod}</span>
+              </div>
+              <div className="flex items-center justify-between gap-2 border-t border-border pt-2 text-sm">
+                <span className="font-semibold">{booking.total.toFixed(3)} OMR</span>
+                <span className="text-muted-foreground">{new Date(booking.createdAt).toLocaleString()}</span>
+              </div>
+              {expandedId === booking.id && (
+                <ul className="flex flex-col gap-1 border-t border-border pt-2 text-sm text-muted-foreground">
+                  {booking.items.map((item, index) => (
+                    <li key={index}>
+                      {item.courtName} — {item.bookingDate} {item.startTime.slice(0, 5)}–{item.endTime.slice(0, 5)} ({item.price.toFixed(3)} OMR)
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+          ))}
       </div>
 
       <div className="mt-4 flex items-center justify-between">

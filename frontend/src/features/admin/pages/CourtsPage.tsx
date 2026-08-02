@@ -110,7 +110,7 @@ export function CourtsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <div className="flex justify-end gap-1">
+                    <div className="flex justify-end gap-2">
                       <Button
                         variant="ghost"
                         size="icon-sm"

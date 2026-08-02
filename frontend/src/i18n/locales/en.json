@@ -5,7 +5,9 @@
       "courts": "Courts",
       "closures": "Closures",
       "bookings": "Bookings",
-      "promotions": "Promotions"
+      "promotions": "Promotions",
+      "menu": "Open menu",
+      "close": "Close menu"
     },
     "logout": "Log out",
     "login": {

@@ -5,7 +5,9 @@
       "courts": "الملاعب",
       "closures": "الإغلاقات",
       "bookings": "الحجوزات",
-      "promotions": "العروض"
+      "promotions": "العروض",
+      "menu": "فتح القائمة",
+      "close": "إغلاق القائمة"
     },
     "logout": "تسجيل الخروج",
     "login": {

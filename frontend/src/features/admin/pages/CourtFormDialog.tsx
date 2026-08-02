@@ -135,26 +135,29 @@ export function CourtFormDialog({ open, onOpenChange, court, onSubmit, isSubmitt
             <Label className="mb-2">{t("admin.courts.schedule")}</Label>
             <div className="flex flex-col gap-2">
               {rows.map((row) => (
-                <div key={row.dayOfWeek} className="flex flex-wrap items-center gap-3">
-                  <Switch
-                    checked={row.isOpen}
-                    onCheckedChange={(checked) => updateRow(row.dayOfWeek, { isOpen: checked })}
-                  />
-                  <span className="w-24 shrink-0 text-sm">{days[row.dayOfWeek]}</span>
+                // Stacked on mobile (switch+label, then times) so time inputs never get squeezed
+                <div key={row.dayOfWeek} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                  <div className="flex items-center gap-3">
+                    <Switch
+                      checked={row.isOpen}
+                      onCheckedChange={(checked) => updateRow(row.dayOfWeek, { isOpen: checked })}
+                    />
+                    <span className="w-24 shrink-0 text-sm">{days[row.dayOfWeek]}</span>
+                  </div>
                   {row.isOpen ? (
-                    <div className="flex flex-1 items-center gap-2">
+                    <div className="flex items-center gap-2 sm:flex-1">
                       <Input
                         type="time"
                         value={row.openTime}
                         onChange={(e) => updateRow(row.dayOfWeek, { openTime: e.target.value })}
-                        className="w-32"
+                        className="flex-1 sm:w-32 sm:flex-none"
                       />
                       <span className="text-muted-foreground">–</span>
                       <Input
                         type="time"
                         value={row.closeTime}
                         onChange={(e) => updateRow(row.dayOfWeek, { closeTime: e.target.value })}
-                        className="w-32"
+                        className="flex-1 sm:w-32 sm:flex-none"
                       />
                     </div>
                   ) : (

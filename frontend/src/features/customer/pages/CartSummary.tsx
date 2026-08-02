@@ -40,11 +40,11 @@ export function CartSummary({ cart, onRemove }: Props) {
                 <Button
                   type="button"
                   variant="ghost"
-                  size="icon-xs"
+                  size="icon-sm"
                   aria-label={t("customer.cart.remove")}
                   onClick={() => onRemove(slot.date, slot.startTime)}
                 >
-                  <X className="size-3" />
+                  <X className="size-3.5" />
                 </Button>
               )}
             </span>

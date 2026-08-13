@@ -3,7 +3,6 @@ import { NavLink, Outlet } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import {
   LayoutDashboard,
-  BarChart3,
   Grid2x2,
   CalendarOff,
   ClipboardList,
@@ -22,7 +21,6 @@ import { Button } from "@/components/ui/button"
 
 const navItems = [
   { to: "/admin", key: "dashboard", icon: LayoutDashboard, end: true },
-  { to: "/admin/analytics", key: "analytics", icon: BarChart3, end: false },
   { to: "/admin/courts", key: "courts", icon: Grid2x2, end: false },
   { to: "/admin/closures", key: "closures", icon: CalendarOff, end: false },
   { to: "/admin/bookings", key: "bookings", icon: ClipboardList, end: false },

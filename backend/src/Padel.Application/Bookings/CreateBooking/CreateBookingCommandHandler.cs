@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Padel.Application.Bookings.Services;
@@ -162,9 +163,9 @@ public sealed class CreateBookingCommandHandler(IApplicationDbContext context, I
     {
         for (var attempt = 0; attempt < 5; attempt++)
         {
-            var suffix = new string(Enumerable.Range(0, 6)
-                .Select(_ => ReferenceAlphabet[Random.Shared.Next(ReferenceAlphabet.Length)])
-                .ToArray());
+            // Cryptographically secure — booking references are enumerable/scannable via the
+            // customer lookup endpoint, so guessability matters even though they aren't secrets.
+            var suffix = new string(RandomNumberGenerator.GetItems<char>(ReferenceAlphabet, 6));
             var reference = $"PDL-{suffix}";
 
             var exists = await context.Bookings.AnyAsync(b => b.BookingReference == reference, cancellationToken);

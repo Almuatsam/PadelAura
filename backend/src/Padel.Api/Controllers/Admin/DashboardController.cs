@@ -16,4 +16,12 @@ public sealed class DashboardController(ISender sender) : ControllerBase
         var summary = await sender.Send(new GetDashboardSummaryQuery(), cancellationToken);
         return Ok(summary);
     }
+
+    [HttpGet("analytics")]
+    public async Task<ActionResult<DashboardAnalyticsDto>> GetAnalytics(
+        [FromQuery] string range, CancellationToken cancellationToken)
+    {
+        var analytics = await sender.Send(new GetDashboardAnalyticsQuery(range), cancellationToken);
+        return Ok(analytics);
+    }
 }

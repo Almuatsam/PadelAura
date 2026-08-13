@@ -2,6 +2,7 @@
   "admin": {
     "nav": {
       "dashboard": "لوحة التحكم",
+      "analytics": "التحليلات",
       "courts": "الملاعب",
       "closures": "الإغلاقات",
       "bookings": "الحجوزات",
@@ -23,6 +24,20 @@
       "todayBookings": "حجوزات اليوم",
       "todayRevenue": "إيرادات اليوم",
       "occupancy": "نسبة الإشغال"
+    },
+    "analytics": {
+      "title": "التحليلات",
+      "range": {
+        "week": "أسبوع",
+        "month": "شهر"
+      },
+      "totalRevenue": "إجمالي الإيرادات",
+      "occupancyRate": "نسبة الإشغال",
+      "busiestHour": "أكثر ساعة ازدحامًا",
+      "dailyRevenue": "الإيرادات اليومية",
+      "dailyOccupancy": "الإشغال اليومي",
+      "busiestHours": "أكثر الساعات ازدحامًا",
+      "noData": "لا توجد حجوزات في هذه الفترة بعد."
     },
     "courts": {
       "title": "الملاعب",

@@ -6,6 +6,7 @@ import { ToastProvider } from "@/lib/toast"
 import { AdminLayout } from "@/features/admin/AdminLayout"
 import { LoginPage } from "@/features/admin/pages/LoginPage"
 import { DashboardPage } from "@/features/admin/pages/DashboardPage"
+import { AnalyticsPage } from "@/features/admin/pages/AnalyticsPage"
 import { CourtsPage } from "@/features/admin/pages/CourtsPage"
 import { ClosuresPage } from "@/features/admin/pages/ClosuresPage"
 import { BookingsPage } from "@/features/admin/pages/BookingsPage"
@@ -39,6 +40,7 @@ function App() {
                 }
               >
                 <Route index element={<DashboardPage />} />
+                <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="courts" element={<CourtsPage />} />
                 <Route path="closures" element={<ClosuresPage />} />
                 <Route path="bookings" element={<BookingsPage />} />

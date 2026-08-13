@@ -2,6 +2,7 @@
   "admin": {
     "nav": {
       "dashboard": "Dashboard",
+      "analytics": "Analytics",
       "courts": "Courts",
       "closures": "Closures",
       "bookings": "Bookings",
@@ -23,6 +24,20 @@
       "todayBookings": "Today's Bookings",
       "todayRevenue": "Today's Revenue",
       "occupancy": "Occupancy Rate"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "range": {
+        "week": "Week",
+        "month": "Month"
+      },
+      "totalRevenue": "Total Revenue",
+      "occupancyRate": "Occupancy Rate",
+      "busiestHour": "Busiest Hour",
+      "dailyRevenue": "Daily Revenue",
+      "dailyOccupancy": "Daily Occupancy",
+      "busiestHours": "Busiest Hours",
+      "noData": "No bookings in this range yet."
     },
     "courts": {
       "title": "Courts",

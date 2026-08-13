@@ -28,13 +28,13 @@ export function CustomerLayout() {
       {/* Corner props — ambient decoration, desktop only so they never compete with content
           on small screens where the toy-shelf nav already claims screen real estate. */}
       <PadelRacket
-        className="pointer-events-none fixed -top-4 -end-4 hidden size-28 rotate-12 text-primary/10 lg:block"
+        className="pointer-events-none fixed -top-4 -end-4 hidden size-28 rotate-12 text-primary/10 lg:block print:hidden"
       />
       <PadelBall
-        className="pointer-events-none fixed bottom-10 -start-6 hidden size-20 text-secondary/20 lg:block"
+        className="pointer-events-none fixed bottom-10 -start-6 hidden size-20 text-secondary/20 lg:block print:hidden"
       />
 
-      <header className="relative z-10 flex items-center justify-between border-b border-border bg-card px-4 py-3 md:px-8">
+      <header className="relative z-10 flex items-center justify-between border-b border-border bg-card px-4 py-3 md:px-8 print:hidden">
         <Link to="/" className="font-display text-xl font-bold text-primary">
           Padel Aura
         </Link>
@@ -49,7 +49,7 @@ export function CustomerLayout() {
       </main>
 
       {/* Toy-shelf bottom nav — mobile only, icons sit like small objects on a shelf. */}
-      <nav className="fixed inset-x-0 bottom-0 z-20 flex justify-center gap-2 border-t border-border bg-card px-4 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-candy-navy md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-20 flex justify-center gap-2 border-t border-border bg-card px-4 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-candy-navy md:hidden print:hidden">
         {shelfNavItems.map(({ to, key, icon: Icon, end }) => (
           <NavLink key={key} to={to} end={end} className={shelfLinkClass}>
             <Icon className="size-5" />

@@ -167,7 +167,9 @@
         "Paid": "Paid",
         "Failed": "Failed",
         "Refunded": "Refunded"
-      }
+      },
+      "qrLabel": "Scan to view this booking",
+      "download": "Download confirmation"
     }
   }
 }

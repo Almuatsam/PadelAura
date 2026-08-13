@@ -22,7 +22,18 @@
       "title": "لوحة التحكم",
       "todayBookings": "حجوزات اليوم",
       "todayRevenue": "إيرادات اليوم",
-      "occupancy": "نسبة الإشغال"
+      "occupancy": "نسبة الإشغال",
+      "trends": "الاتجاهات"
+    },
+    "analytics": {
+      "range": {
+        "week": "هذا الأسبوع",
+        "month": "هذا الشهر"
+      },
+      "dailyRevenue": "الإيرادات اليومية",
+      "dailyOccupancy": "الإشغال اليومي",
+      "busiestHours": "أكثر الساعات ازدحامًا",
+      "noData": "لا توجد حجوزات في هذه الفترة بعد."
     },
     "courts": {
       "title": "الملاعب",
@@ -167,7 +178,9 @@
         "Paid": "مدفوع",
         "Failed": "فشل",
         "Refunded": "مسترجع"
-      }
+      },
+      "qrLabel": "امسح لعرض هذا الحجز",
+      "download": "تنزيل التأكيد"
     }
   }
 }

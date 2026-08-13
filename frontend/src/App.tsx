@@ -39,6 +39,7 @@ function App() {
                 }
               >
                 <Route index element={<DashboardPage />} />
+                <Route path="analytics" element={<Navigate to="/admin" replace />} />
                 <Route path="courts" element={<CourtsPage />} />
                 <Route path="closures" element={<ClosuresPage />} />
                 <Route path="bookings" element={<BookingsPage />} />

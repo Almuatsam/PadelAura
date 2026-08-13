@@ -1,7 +1,8 @@
 import { useParams, useSearchParams } from "react-router-dom"
 import { useQuery } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
-import { RefreshCw } from "lucide-react"
+import { QRCodeSVG } from "qrcode.react"
+import { Printer, RefreshCw } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -46,8 +47,22 @@ export function BookingConfirmationPage() {
         </Badge>
       </Card>
 
+      <Card shape="blob-2" tint="slate" className="items-center gap-2 text-center">
+        <QRCodeSVG value={`${window.location.origin}/booking/${booking.bookingReference}`} size={160} />
+        <p className="text-sm text-muted-foreground">{t("customer.confirmation.qrLabel")}</p>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="print:hidden"
+          onClick={() => window.print()}
+        >
+          <Printer className="size-4" />
+          {t("customer.confirmation.download")}
+        </Button>
+      </Card>
+
       {isStillProcessing && (
-        <div className="flex items-center justify-between rounded-2xl border border-warning/20 bg-warning/10 p-3 text-sm text-warning">
+        <div className="flex items-center justify-between rounded-2xl border border-warning/20 bg-warning/10 p-3 text-sm text-warning print:hidden">
           <span>{t("customer.confirmation.processing")}</span>
           {isFetching ? (
             <Spinner label={t("customer.confirmation.refresh")} />

@@ -22,7 +22,18 @@
       "title": "Dashboard",
       "todayBookings": "Today's Bookings",
       "todayRevenue": "Today's Revenue",
-      "occupancy": "Occupancy Rate"
+      "occupancy": "Occupancy Rate",
+      "trends": "Trends"
+    },
+    "analytics": {
+      "range": {
+        "week": "This Week",
+        "month": "This Month"
+      },
+      "dailyRevenue": "Daily Revenue",
+      "dailyOccupancy": "Daily Occupancy",
+      "busiestHours": "Busiest Hours",
+      "noData": "No bookings in this range yet."
     },
     "courts": {
       "title": "Courts",
@@ -167,7 +178,9 @@
         "Paid": "Paid",
         "Failed": "Failed",
         "Refunded": "Refunded"
-      }
+      },
+      "qrLabel": "Scan to view this booking",
+      "download": "Download confirmation"
     }
   }
 }

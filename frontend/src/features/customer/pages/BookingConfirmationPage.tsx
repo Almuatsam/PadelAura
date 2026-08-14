@@ -48,14 +48,13 @@ export function BookingConfirmationPage() {
       </Card>
 
       <Card shape="blob-2" tint="slate" className="items-center gap-2 text-center">
-        <QRCodeSVG value={`${window.location.origin}/booking/${booking.bookingReference}`} size={160} />
+        <QRCodeSVG
+          value={`${window.location.origin}/booking/${booking.bookingReference}`}
+          size={160}
+          title={t("customer.confirmation.qrLabel")}
+        />
         <p className="text-sm text-muted-foreground">{t("customer.confirmation.qrLabel")}</p>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="print:hidden"
-          onClick={() => window.print()}
-        >
+        <Button variant="ghost" className="print:hidden" onClick={() => window.print()}>
           <Printer className="size-4" />
           {t("customer.confirmation.download")}
         </Button>

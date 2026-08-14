@@ -86,7 +86,7 @@ export function DashboardPage() {
               key={option}
               type="button"
               variant={range === option ? "default" : "ghost"}
-              size="sm"
+              aria-pressed={range === option}
               onClick={() => setRange(option)}
             >
               {t(`admin.analytics.range.${option}`)}

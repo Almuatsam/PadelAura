@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -100,6 +101,19 @@ builder.Services.AddRateLimiter(options =>
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 30, Window = TimeSpan.FromMinutes(1) }));
 });
 
+// Render (and most PaaS hosts) terminate TLS at their edge and forward plain HTTP to the
+// container, so Kestrel sees every request as HTTP unless it trusts the edge's forwarded
+// headers. Without this, UseHsts()/UseHttpsRedirection() below never see IsHttps=true and the
+// HSTS header silently never gets sent. The container has no other inbound path, so trusting
+// X-Forwarded-* unconditionally (no fixed known-proxy IP range from the host) is the standard
+// trade-off for this hosting model.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 builder.Services.AddCors(options =>
 {
@@ -126,6 +140,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
+app.UseForwardedHeaders();
 app.UseExceptionHandler();
 
 // Baseline security headers on every response — clickjacking, MIME-sniffing, and referrer leakage

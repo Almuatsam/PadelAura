@@ -1,0 +1,9 @@
+**/bin/
+**/obj/
+**/*.user
+**/.vs/
+backend/tests/
+frontend/node_modules/
+frontend/dist/
+.git/
+*.log

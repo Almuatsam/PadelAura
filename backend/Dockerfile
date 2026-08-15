@@ -1,13 +1,13 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY src/Padel.Domain/Padel.Domain.csproj src/Padel.Domain/
-COPY src/Padel.Application/Padel.Application.csproj src/Padel.Application/
-COPY src/Padel.Infrastructure/Padel.Infrastructure.csproj src/Padel.Infrastructure/
-COPY src/Padel.Api/Padel.Api.csproj src/Padel.Api/
+COPY backend/src/Padel.Domain/Padel.Domain.csproj src/Padel.Domain/
+COPY backend/src/Padel.Application/Padel.Application.csproj src/Padel.Application/
+COPY backend/src/Padel.Infrastructure/Padel.Infrastructure.csproj src/Padel.Infrastructure/
+COPY backend/src/Padel.Api/Padel.Api.csproj src/Padel.Api/
 RUN dotnet restore src/Padel.Api/Padel.Api.csproj
 
-COPY src/ src/
+COPY backend/src/ src/
 RUN dotnet publish src/Padel.Api/Padel.Api.csproj -c Release -o /app --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
